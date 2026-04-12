@@ -1,26 +1,27 @@
 @import "tailwindcss";
 
+@theme {
+  /* 1. Typography: Link the Geist variable we created in layout.tsx */
+  --font-sans: var(--font-geist);
+
+  /* 2. Brand Colors */
+  --color-background: #121212;    /* Very Dark Gray (Off-black) */
+  --color-surface: #1e1e1e;       /* Slightly lighter gray for cards/inputs */
+  --color-primary: #ec4899;      /* Vibrant Pink (Accent) */
+  --color-primary-hover: #db2777; /* Darker Pink for hover states */
+  
+  /* 3. Neutral Colors for Text */
+  --color-text-main: #f8fafc;     /* Almost white */
+  --color-text-muted: #94a3b8;    /* Gray for secondary text */
+}
+
+/* Base Styles */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  background-color: var(--color-background);
+  color: var(--color-text-main);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Ensuring the background spans the full height */
+  min-height: 100vh;
 }
