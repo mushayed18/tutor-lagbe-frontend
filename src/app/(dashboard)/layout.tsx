@@ -7,7 +7,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="w-8/12 mx-auto relative min-h-screen">
+    <div className="lg:w-9/12 lg:mx-auto relative min-h-screen">
       {/* MainLayout handles Sidebar (Left), Content (Center), and RightPanel (Right) */}
       <MainLayout>
         {children}

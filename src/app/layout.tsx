@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import ToasterProvider from "@/components/shared/ToasterProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -19,9 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       {/* Added bg-background and text-text-main to prevent white flashes */}
-      <body className={`${geist.variable} font-sans antialiased bg-background text-text-main`}>
-        <ToasterProvider />
-        {children}
+      <body
+        className={`${geist.variable} font-sans antialiased bg-background text-text-main`}
+      >
+        <AuthProvider>
+          <ToasterProvider />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

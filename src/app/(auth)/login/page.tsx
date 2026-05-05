@@ -11,9 +11,11 @@ import { loginSchema, LoginInput } from "@/lib/validations/auth";
 import { fetcher } from "@/lib/api-client";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -39,6 +41,8 @@ export default function LoginPage() {
       }
 
       toast.success("Welcome back!");
+
+      await refreshUser();
       
       // The browser now has the 'token' cookie. 
       // We refresh to update the Server Components and redirect.
