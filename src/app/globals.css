@@ -9,6 +9,8 @@
   --color-surface: #1e1e1e;       /* Slightly lighter gray for cards/inputs */
   --color-primary: #ec4899;      /* Vibrant Pink (Accent) */
   --color-primary-hover: #db2777; /* Darker Pink for hover states */
+
+  --color-surface-hover: #2a2a2a;
   
   /* 3. Neutral Colors for Text */
   --color-text-main: #f8fafc;     /* Almost white */

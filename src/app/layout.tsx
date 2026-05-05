@@ -15,13 +15,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      {/* Applying the font variable and antialiasing for crisp text */}
-      <body className={`${geist.variable} font-sans antialiased`}>
+      {/* Added bg-background and text-text-main to prevent white flashes */}
+      <body className={`${geist.variable} font-sans antialiased bg-background text-text-main`}>
         <ToasterProvider />
         {children}
       </body>
