@@ -1,7 +1,9 @@
 "use client";
 
-import { TuitionPost } from "@/types/tuition";
+import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 import {
   MapPin,
   Clock,
@@ -10,14 +12,56 @@ import {
   Send,
   Eye,
   Crown,
+  Loader2,
 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { TuitionPost } from "@/types/tuition";
+import { fetcher } from "@/lib/api-client";
+import { toast } from "sonner";
+
+// Import our sub-components
+import { Detail } from "./card-items/Detail";
+import { ActionButton } from "./card-items/ActionButton";
 
 export default function TuitionCard({ post }: { post: TuitionPost }) {
+  const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
+  const [isPending, setIsPending] = useState(false);
+
   const isPremium = post.parent.subscriptionType === "PREMIUM";
   const isClosed = post.status === "CLOSED";
+
+  const handleBookmark = async () => {
+    if (isPending) return;
+    setIsPending(true);
+
+    try {
+      if (isBookmarked) {
+        // DELETE Route: /bookmarks/:tuitionId
+        const res = await fetcher(`/bookmarks/${post.id}`, {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          setIsBookmarked(false);
+          toast.success("Bookmark removed");
+        }
+      } else {
+        // POST Route: /bookmarks (Body: { tuitionId })
+        const res = await fetcher("/bookmarks", {
+          method: "POST",
+          body: JSON.stringify({ tuitionId: post.id }),
+        });
+        if (res.ok) {
+          setIsBookmarked(true);
+          toast.success("Saved to bookmarks");
+        }
+      }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("Action failed. Try again.");
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <div
@@ -26,7 +70,7 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
         isPremium && "border-primary/20 bg-primary/2",
       )}
     >
-      {/* Header: User Info & Featured Badge */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-surface-hover overflow-hidden relative border border-border">
@@ -55,11 +99,6 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
             </p>
           </div>
         </div>
-        {isPremium && (
-          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-1 rounded-full uppercase">
-            Featured
-          </span>
-        )}
       </div>
 
       {/* Content */}
@@ -67,12 +106,10 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
         <h3 className="text-lg font-bold text-text-main mb-2 leading-tight">
           {post.title}
         </h3>
-
-        <p className="text-text-muted text-sm mb-4 leading-relaxed">
+        <p className="text-text-muted text-sm mb-4 leading-relaxed line-clamp-2">
           {post.description}
         </p>
 
-        {/* Quick Details Grid */}
         <div className="grid grid-cols-2 gap-y-2 gap-x-4 mb-4">
           <Detail icon={MapPin} label={post.location} />
           <Detail icon={Calendar} label={`${post.daysPerWeek} days/week`} />
@@ -83,49 +120,41 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Footer Actions */}
       <div className="flex items-center justify-between pt-4 border-t border-border">
-        <ActionButton icon={Bookmark} label="Save" />
+        {/* Custom Toggle for Bookmark */}
+        <button
+          onClick={handleBookmark}
+          disabled={isPending}
+          className={cn(
+            "flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all active:scale-95",
+            isBookmarked
+              ? "text-primary bg-primary/5"
+              : "text-text-muted hover:bg-surface-hover",
+          )}
+        >
+          {isPending ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : (
+            <Bookmark
+              size={18}
+              className={cn(isBookmarked && "fill-primary")}
+            />
+          )}
+          <span>{isBookmarked ? "Saved" : "Save"}</span>
+        </button>
+
         <ActionButton
           icon={Send}
           label={isClosed ? "Closed" : "Apply"}
           primary
           disabled={isClosed}
         />
-        <Link href={`/tutor/feed/${post.id}`} className="block">
+
+        <Link href={`/tutor/feed/${post.id}`}>
           <ActionButton icon={Eye} label="Details" />
         </Link>
       </div>
     </div>
-  );
-}
-
-// Sub-components for cleaner code
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Detail({ icon: Icon, label }: { icon: any; label: string }) {
-  return (
-    <div className="flex items-center gap-2 text-text-muted text-sm truncate">
-      <Icon size={16} />
-      <span className="truncate">{label}</span>
-    </div>
-  );
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ActionButton({ icon: Icon, label, primary, disabled }: any) {
-  return (
-    <button
-      disabled={disabled}
-      className={cn(
-        "cursor-pointer flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all active:scale-95",
-        primary
-          ? "text-primary hover:bg-primary/10"
-          : "text-text-muted hover:bg-surface-hover",
-        disabled && "opacity-50 grayscale cursor-not-allowed",
-      )}
-    >
-      <Icon size={18} />
-      <span>{label}</span>
-    </button>
   );
 }

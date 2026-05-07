@@ -17,6 +17,7 @@ export interface TuitionPost {
   timeSlot: string;
   status: "OPEN" | "CLOSED";
   createdAt: string;
+  isBookmarked: boolean;
   parent: TuitionParent;
 }
 

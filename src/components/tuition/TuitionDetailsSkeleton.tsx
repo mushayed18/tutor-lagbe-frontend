@@ -6,7 +6,7 @@ export default function DetailsSkeleton() {
       <Skeleton className="h-6 w-32" />
       <Skeleton className="h-40 w-full rounded-2xl" />
       <div className="grid grid-cols-1 gap-6">
-        <Skeleton className="md:col-span-2 h-96 rounded-2xl" />
+        <Skeleton className="h-96 rounded-2xl" />
         <Skeleton className="h-80 rounded-2xl" />
       </div>
     </div>
