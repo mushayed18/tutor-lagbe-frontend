@@ -8,7 +8,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <Sidebar />
 
       {/* 2. CENTER CONTENT (The Scrollable Feed) */}
-      <main className="flex-1 border-r border-border min-w-0">
+      <main className="flex-1 min-w-0">
         {/* 
             On Mobile, this will take 100% width.
             On Desktop, it is bounded by the two sidebars.

@@ -7,10 +7,31 @@ import Link from "next/link";
 export default function RightPanel() {
   const { user, isLoading } = useAuth();
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="w-80 h-screen border-l border-border animate-pulse" />
+      <aside className="hidden lg:flex flex-col gap-6 w-80 h-screen sticky top-0 p-4 border-l border-border bg-background">
+        {/* Status Card Skeleton */}
+        <div className="p-4 rounded-2xl border border-border space-y-4">
+          <div className="flex justify-between">
+            <div className="h-3 w-20 bg-surface-hover animate-pulse rounded" />
+            <div className="h-5 w-14 bg-surface-hover animate-pulse rounded-full" />
+          </div>
+          <div className="h-4 w-full bg-surface-hover animate-pulse rounded" />
+        </div>
+
+        {/* Premium CTA Skeleton */}
+        <div className="p-6 rounded-2xl border border-border space-y-4">
+          <div className="w-10 h-10 bg-surface-hover animate-pulse rounded-lg" />
+          <div className="h-5 w-32 bg-surface-hover animate-pulse rounded" />
+          <div className="space-y-2">
+            <div className="h-3 w-full bg-surface-hover animate-pulse rounded" />
+            <div className="h-3 w-2/3 bg-surface-hover animate-pulse rounded" />
+          </div>
+          <div className="h-10 w-full bg-surface-hover animate-pulse rounded-xl" />
+        </div>
+      </aside>
     );
+  }
 
   const isPremium = user?.subscriptionType === "PREMIUM";
 
