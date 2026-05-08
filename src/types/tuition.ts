@@ -18,6 +18,7 @@ export interface TuitionPost {
   status: "OPEN" | "CLOSED";
   createdAt: string;
   isBookmarked: boolean;
+  hasApplied: boolean;
   parent: TuitionParent;
 }
 

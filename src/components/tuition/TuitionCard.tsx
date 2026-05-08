@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { TuitionPost } from "@/types/tuition";
 import { fetcher } from "@/lib/api-client";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 // Import our sub-components
 import { Detail } from "./card-items/Detail";
@@ -27,8 +28,36 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
   const [isPending, setIsPending] = useState(false);
 
+  const [hasApplied, setHasApplied] = useState(post.hasApplied);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
+
   const isPremium = post.parent.subscriptionType === "PREMIUM";
   const isClosed = post.status === "CLOSED";
+
+  const handleApply = async () => {
+    setIsApplying(true);
+    try {
+      const res = await fetcher("/applications", {
+        method: "POST",
+        body: JSON.stringify({ tuitionId: post.id }),
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        setHasApplied(true);
+        toast.success("Applied successfully!");
+        setIsModalOpen(false); // Close modal on success
+      } else {
+        toast.error(result.message || "Failed to apply");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("Application failed. Try again.");
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   const handleBookmark = async () => {
     if (isPending) return;
@@ -55,7 +84,7 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
           toast.success("Saved to bookmarks");
         }
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Action failed. Try again.");
     } finally {
@@ -144,17 +173,40 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
           <span>{isBookmarked ? "Saved" : "Save"}</span>
         </button>
 
-        <ActionButton
-          icon={Send}
-          label={isClosed ? "Closed" : "Apply"}
-          primary
-          disabled={isClosed}
-        />
+        {/* Apply Logic */}
+        {hasApplied ? (
+          <div className="flex items-center gap-2 px-3 py-2 text-green-600 font-bold text-sm">
+            <Send size={18} className="fill-green-600" />
+            <span>Applied</span>
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsModalOpen(true)} // Open the modal
+            disabled={isClosed}
+            className={cn(
+              "flex items-center cursor-pointer gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all active:scale-95 text-primary hover:bg-primary/10",
+              isClosed && "opacity-50 cursor-not-allowed grayscale",
+            )}
+          >
+            <Send size={18} />
+            <span>{isClosed ? "Closed" : "Apply"}</span>
+          </button>
+        )}
 
         <Link href={`/tutor/feed/${post.id}`}>
           <ActionButton icon={Eye} label="Details" />
         </Link>
       </div>
+
+      {/* THE MODAL */}
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleApply}
+        isLoading={isApplying}
+        title="Apply for Tuition"
+        message={`Are you sure you want to apply for "${post.title}"? Once applied, you cannot withdraw your application.`}
+      />
     </div>
   );
 }

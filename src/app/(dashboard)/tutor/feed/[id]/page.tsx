@@ -18,6 +18,7 @@ import {
   DollarSign,
   BookOpen,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
@@ -25,6 +26,7 @@ import { format } from "date-fns";
 import DetailsSkeleton from "@/components/tuition/TuitionDetailsSkeleton";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/ui/ConfirmModal"; // Import your new modal
 
 export default function TuitionDetailsPage() {
   const { id } = useParams();
@@ -32,9 +34,12 @@ export default function TuitionDetailsPage() {
   const [data, setData] = useState<TuitionDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Bookmark local states
+  // States for Bookmark & Application
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
+  const [isPending, setIsPending] = useState(false); // for bookmark
+  const [isApplying, setIsApplying] = useState(false); // for API call
+  const [isModalOpen, setIsModalOpen] = useState(false); // for confirmation
 
   useEffect(() => {
     const getDetails = async () => {
@@ -43,8 +48,8 @@ export default function TuitionDetailsPage() {
         const result = await res.json();
         if (result.success) {
           setData(result.data);
-          // Set initial bookmark state from backend response
           setIsBookmarked(result.data.isBookmarked);
+          setHasApplied(result.data.hasApplied); // Set initial application status
         }
       } catch (err) {
         console.error(err);
@@ -55,13 +60,36 @@ export default function TuitionDetailsPage() {
     getDetails();
   }, [id]);
 
+  const handleApply = async () => {
+    if (!data) return;
+    setIsApplying(true);
+    try {
+      const res = await fetcher("/applications", {
+        method: "POST",
+        body: JSON.stringify({ tuitionId: data.id }),
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        setHasApplied(true);
+        toast.success("Applied successfully!");
+        setIsModalOpen(false);
+      } else {
+        toast.error(result.message || "Failed to apply");
+      }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
   const handleBookmark = async () => {
     if (isPending || !data) return;
     setIsPending(true);
-
     try {
       if (isBookmarked) {
-        // Remove Bookmark logic
         const res = await fetcher(`/bookmarks/${data.id}`, {
           method: "DELETE",
         });
@@ -70,7 +98,6 @@ export default function TuitionDetailsPage() {
           toast.success("Removed from bookmarks");
         }
       } else {
-        // Add Bookmark logic
         const res = await fetcher("/bookmarks", {
           method: "POST",
           body: JSON.stringify({ tuitionId: data.id }),
@@ -95,6 +122,16 @@ export default function TuitionDetailsPage() {
 
   return (
     <div className="max-w-3xl mx-auto py-6 px-4 pb-24">
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleApply}
+        isLoading={isApplying}
+        title="Confirm Application"
+        message={`Are you sure you want to apply for "${data.title}"? This action cannot be undone.`}
+      />
+
       {/* Back Button */}
       <button
         onClick={() => router.back()}
@@ -135,7 +172,6 @@ export default function TuitionDetailsPage() {
         </div>
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 gap-6">
         <div className="space-y-6">
           <section className="bg-background border border-border rounded-2xl p-6">
@@ -168,7 +204,6 @@ export default function TuitionDetailsPage() {
           </section>
         </div>
 
-        {/* Parent Info & Actions */}
         <div className="space-y-6">
           <div className="bg-background border border-border rounded-2xl p-6 sticky top-24">
             <div className="flex items-center gap-4 mb-6">
@@ -193,13 +228,22 @@ export default function TuitionDetailsPage() {
             </div>
 
             <div className="space-y-3">
-              <Button
-                variant="primary"
-                className="w-full gap-2 py-6 text-lg"
-                disabled={isClosed}
-              >
-                <Send size={20} /> {isClosed ? "Position Filled" : "Apply Now"}
-              </Button>
+              {hasApplied ? (
+                <div className="w-full py-4 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center gap-2 text-green-600 font-bold">
+                  <CheckCircle2 size={20} />
+                  Already Applied
+                </div>
+              ) : (
+                <Button
+                  variant="primary"
+                  className="w-full gap-2 py-6 text-lg"
+                  disabled={isClosed}
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  <Send size={20} />{" "}
+                  {isClosed ? "Position Filled" : "Apply Now"}
+                </Button>
+              )}
 
               <Button
                 variant="outline"
