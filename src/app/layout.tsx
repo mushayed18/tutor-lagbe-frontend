@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import ToasterProvider from "@/components/shared/ToasterProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
+import { NotificationProvider } from "@/providers/NotificationProvider";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -24,8 +25,10 @@ export default function RootLayout({
         className={`${geist.variable} font-sans antialiased bg-background text-text-main`}
       >
         <AuthProvider>
-          <ToasterProvider />
-          {children}
+          <NotificationProvider>
+            <ToasterProvider />
+            {children}
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>
