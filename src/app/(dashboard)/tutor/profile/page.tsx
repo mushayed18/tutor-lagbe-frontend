@@ -6,6 +6,7 @@ import ProfileInfoCard from "@/components/profile/ProfileInfoCard";
 import ProfileSkeleton from "@/components/profile/ProfileSkeleton"; // Create this for loading
 import { Mail, Phone, Calendar, ShieldCheck } from "lucide-react";
 import EditProfileButton from "@/components/profile/EditProfileButton";
+import ReviewList from "@/components/profile/ReviewList";
 
 export default function MyProfilePage() {
   const { user, isLoading } = useAuth();
@@ -63,6 +64,10 @@ export default function MyProfilePage() {
         </div>
 
         <EditProfileButton />
+      </div>
+
+      <div className="bg-surface-main/30 border-t border-border mt-6">
+        <ReviewList userId={user.id} />
       </div>
     </div>
   );

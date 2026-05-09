@@ -77,7 +77,7 @@ export default function TuitionDetailsPage() {
       } else {
         toast.error(result.message || "Failed to apply");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
@@ -107,7 +107,7 @@ export default function TuitionDetailsPage() {
           toast.success("Saved to bookmarks");
         }
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
@@ -137,7 +137,7 @@ export default function TuitionDetailsPage() {
         onClick={() => router.back()}
         className="flex cursor-pointer items-center gap-2 text-text-muted hover:text-primary mb-6 transition-colors"
       >
-        <ChevronLeft size={20} /> Back to Feed
+        <ChevronLeft size={20} /> Back
       </button>
 
       {/* Header Section */}

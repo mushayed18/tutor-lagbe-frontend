@@ -67,7 +67,7 @@ export default function EditProfilePage() {
       <div className="flex items-center justify-between mb-8">
         <button
           onClick={() => router.back()}
-          className="p-2 hover:bg-surface-hover rounded-full transition-colors"
+          className="p-2 hover:bg-surface-hover rounded-full transition-colors cursor-pointer"
         >
           <ArrowLeft size={24} />
         </button>
