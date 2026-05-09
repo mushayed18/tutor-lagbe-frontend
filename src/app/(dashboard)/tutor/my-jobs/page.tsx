@@ -50,11 +50,8 @@ export default function MyConnectionsPage() {
       <div className="p-6 bg-background/80 backdrop-blur-md sticky top-0 z-10">
         <h1 className="text-2xl font-bold text-text-main flex items-center gap-3">
           <Users className="text-primary" />
-          My Connections
+          My Jobs
         </h1>
-        <p className="text-text-muted text-sm mt-1">
-          Active conversations and hire history.
-        </p>
       </div>
 
       {/* List Area */}
