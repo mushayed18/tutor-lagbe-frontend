@@ -45,8 +45,8 @@ export default function PortfolioPage() {
   if (loading) return <PortfolioSkeleton />;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-      <div className="bg-background border border-border rounded-4xl p-8 md:p-10 shadow-sm">
+    <div className="max-w-2xl mx-auto md:px-4 py-8 pb-24">
+      <div className="bg-background md:border md:border-border rounded-4xl p-2 md:p-10 shadow-sm">
         {!portfolio ? (
           <div className="md:p-12 text-center space-y-4">
             <div className="w-20 h-20 bg-primary/5 text-primary rounded-full flex items-center justify-center mx-auto mb-6">

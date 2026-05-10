@@ -33,13 +33,13 @@ export default function PortfolioHeader({
             <h1 className="text-2xl font-black text-text-main">{name}</h1>
             <CheckCircle2 size={18} className="text-primary fill-primary/10" />
           </div>
-          <p className="text-primary font-bold text-sm tracking-tight uppercase">
-            {headline}
-          </p>
         </div>
       </div>
 
-      <div className="bg-surface-main/30">
+      <div className="bg-surface-main/30 space-y-2">
+        <p className="text-primary font-bold text-sm tracking-tight uppercase">
+          {headline}
+        </p>
         <p className="text-text-main/90 text-sm leading-relaxed whitespace-pre-wrap">
           {bio}
         </p>
