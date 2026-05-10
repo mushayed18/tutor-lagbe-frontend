@@ -2,18 +2,13 @@
 
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import {
-  Trophy,
-  XCircle,
-  Bell,
-  Calendar,
-  ChevronRight,
-} from "lucide-react";
+import { useAuth } from "@/providers/AuthProvider"; // 1. Import your Auth hook
+import { Trophy, XCircle, Bell, Calendar, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NotificationItemProps {
   notification: {
-    id: true;
+    id: string; // Changed from true to string based on your Prisma/API
     title: string;
     message: string;
     type: string;
@@ -25,7 +20,8 @@ interface NotificationItemProps {
 export default function NotificationItem({
   notification,
 }: NotificationItemProps) {
-  // Map notification types to specific styles
+  const { user } = useAuth(); // 2. Get the current user
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const typeConfig: Record<string, { icon: any; color: string; bg: string }> = {
     HIRED: { icon: Trophy, color: "text-emerald-600", bg: "bg-emerald-50" },
@@ -37,7 +33,21 @@ export default function NotificationItem({
   const config = typeConfig[notification.type] || typeConfig.DEFAULT;
   const Icon = config.icon;
 
-  // If there's a tuitionId, wrap in a Link, otherwise it's a static div
+  // 3. Determine the redirect URL based on role
+  const getRedirectUrl = () => {
+    if (!notification.tuitionId) return null;
+
+    // If Parent: Go to their tuition management page
+    if (user?.role === "PARENT") {
+      return `/parent/my-tuitions/${notification.tuitionId}`;
+    }
+
+    // If Tutor: Go to the job feed/details
+    return `/tutor/feed/${notification.tuitionId}`;
+  };
+
+  const redirectUrl = getRedirectUrl();
+
   const content = (
     <div className="relative group flex items-start gap-4 p-5 rounded-2xl border border-border bg-background transition-all duration-300 hover:border-primary/30 hover:shadow-sm">
       <div className={cn("p-3 rounded-xl shrink-0", config.bg, config.color)}>
@@ -60,7 +70,7 @@ export default function NotificationItem({
         </p>
       </div>
 
-      {notification.tuitionId && (
+      {redirectUrl && (
         <div className="self-center ml-2 text-text-muted group-hover:text-primary transition-colors">
           <ChevronRight size={18} />
         </div>
@@ -68,12 +78,9 @@ export default function NotificationItem({
     </div>
   );
 
-  if (notification.tuitionId) {
+  if (redirectUrl) {
     return (
-      <Link
-        href={`/tutor/feed/${notification.tuitionId}`}
-        className="block mb-3"
-      >
+      <Link href={redirectUrl} className="block mb-3">
         {content}
       </Link>
     );

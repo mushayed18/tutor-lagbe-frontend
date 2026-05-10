@@ -26,6 +26,7 @@ export const NAV_LINKS = {
     { label: "Home", href: "/parent/feed", icon: House, priority: true },
     { label: "Create a job post", href: "/parent/create-job-post", icon: PencilLine, priority: true },
     { label: "My Tuitions", href: "/parent/my-tuitions", icon: FileText, priority: true },
+    { label: "Bookmarks", href: "/parent/bookmarks", icon: Bookmark, priority: true },
     { label: "Notifications", href: "/parent/notifications", icon: Bell, priority: true },
     { label: "My Tutors", href: "/parent/my-tutors", icon: Users, priority: true },
     { label: "Profile", href: "/parent/profile", icon: UserCircle, priority: true },
