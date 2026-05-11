@@ -1,6 +1,6 @@
 "use client";
 
-interface PortfolioFormInputProps {
+interface FormInputProps {
   label: string;
   name: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,7 +11,7 @@ interface PortfolioFormInputProps {
   isTextArea?: boolean;
 }
 
-export default function PortfolioFormInput({
+export default function FormInput({
   label,
   name,
   register,
@@ -19,7 +19,7 @@ export default function PortfolioFormInput({
   type = "text",
   placeholder,
   isTextArea = false,
-}: PortfolioFormInputProps) {
+}: FormInputProps) {
   const inputStyles = `w-full px-4 py-3 rounded-2xl border ${
     error
       ? "border-red-500 focus:ring-red-500/10"

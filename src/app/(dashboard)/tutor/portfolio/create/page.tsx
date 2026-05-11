@@ -8,7 +8,7 @@ import { z } from "zod";
 import { fetcher } from "@/lib/api-client";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Check } from "lucide-react";
-import PortfolioFormInput from "@/components/portfolio/PortfolioFormInput";
+import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 
 // Sync with your backend Zod schema
@@ -55,7 +55,7 @@ export default function CreatePortfolioPage() {
       } else {
         toast.error(result.message || "Failed to create portfolio");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
@@ -82,7 +82,7 @@ export default function CreatePortfolioPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-background md:border md:border-border rounded-4xl md:p-8 space-y-6 shadow-sm">
-          <PortfolioFormInput
+          <FormInput
             label="Professional Headline"
             name="headline"
             placeholder="e.g. Expert Mathematics & Physics Tutor"
@@ -90,7 +90,7 @@ export default function CreatePortfolioPage() {
             error={errors.headline?.message}
           />
 
-          <PortfolioFormInput
+          <FormInput
             label="Short Bio"
             name="bio"
             placeholder="Tell parents about your teaching style and background..."
@@ -100,14 +100,14 @@ export default function CreatePortfolioPage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <PortfolioFormInput
+            <FormInput
               label="University"
               name="university"
               placeholder="e.g. University of Dhaka"
               register={register}
               error={errors.university?.message}
             />
-            <PortfolioFormInput
+            <FormInput
               label="Department"
               name="department"
               placeholder="e.g. CSE"
@@ -116,7 +116,7 @@ export default function CreatePortfolioPage() {
             />
           </div>
 
-          <PortfolioFormInput
+          <FormInput
             label="Tutoring Experience"
             name="experience"
             placeholder="e.g. 3 years of home tutoring"
@@ -124,7 +124,7 @@ export default function CreatePortfolioPage() {
             error={errors.experience?.message}
           />
 
-          <PortfolioFormInput
+          <FormInput
             label="Expertise Subjects"
             name="subjects"
             placeholder="e.g. Math, Higher Math, Physics"
@@ -132,7 +132,7 @@ export default function CreatePortfolioPage() {
             error={errors.subjects?.message}
           />
 
-          <PortfolioFormInput
+          <FormInput
             label="Preferred Classes"
             name="preferredClasses"
             placeholder="e.g. Class 9-12, O Levels"
@@ -141,7 +141,7 @@ export default function CreatePortfolioPage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <PortfolioFormInput
+            <FormInput
               label="Expected Salary (Monthly)"
               name="expectedSalary"
               type="number"
@@ -149,7 +149,7 @@ export default function CreatePortfolioPage() {
               register={register}
               error={errors.expectedSalary?.message}
             />
-            <PortfolioFormInput
+            <FormInput
               label="Weekly Availability"
               name="availability"
               placeholder="e.g. 3 days/week, Evening"

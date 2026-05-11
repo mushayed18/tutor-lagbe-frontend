@@ -8,7 +8,7 @@ import { z } from "zod";
 import { fetcher } from "@/lib/api-client";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
-import PortfolioFormInput from "@/components/portfolio/PortfolioFormInput";
+import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import EditPortfolioSkeleton from "@/components/portfolio/EditPortfolioSkeleton";
 
@@ -110,7 +110,7 @@ export default function EditPortfolioPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-background md:border md:border-border rounded-4xl md:p-8 space-y-6 shadow-sm">
-          <PortfolioFormInput
+          <FormInput
             label="Professional Headline"
             name="headline"
             placeholder="e.g. Senior Science Specialist"
@@ -118,7 +118,7 @@ export default function EditPortfolioPage() {
             error={errors.headline?.message}
           />
 
-          <PortfolioFormInput
+          <FormInput
             label="Bio / Teaching Philosophy"
             name="bio"
             placeholder="Update your teaching approach..."
@@ -128,14 +128,14 @@ export default function EditPortfolioPage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <PortfolioFormInput
+            <FormInput
               label="University"
               name="university"
               register={register}
               placeholder="University"
               error={errors.university?.message}
             />
-            <PortfolioFormInput
+            <FormInput
               label="Department"
               name="department"
               register={register}
@@ -144,7 +144,7 @@ export default function EditPortfolioPage() {
             />
           </div>
 
-          <PortfolioFormInput
+          <FormInput
             label="Tutoring Experience"
             name="experience"
             placeholder="How many years?"
@@ -152,7 +152,7 @@ export default function EditPortfolioPage() {
             error={errors.experience?.message}
           />
 
-          <PortfolioFormInput
+          <FormInput
             label="Expertise Subjects"
             name="subjects"
             placeholder="Math, Physics, etc."
@@ -160,7 +160,7 @@ export default function EditPortfolioPage() {
             error={errors.subjects?.message}
           />
 
-          <PortfolioFormInput
+          <FormInput
             label="Preferred Classes"
             name="preferredClasses"
             placeholder="Class 9-10, O Levels"
@@ -169,7 +169,7 @@ export default function EditPortfolioPage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <PortfolioFormInput
+            <FormInput
               label="Expected Salary"
               name="expectedSalary"
               type="number"
@@ -177,7 +177,7 @@ export default function EditPortfolioPage() {
               register={register}
               error={errors.expectedSalary?.message}
             />
-            <PortfolioFormInput
+            <FormInput
               label="Availability"
               name="availability"
               placeholder="e.g. Weekends, 4PM - 8PM"
