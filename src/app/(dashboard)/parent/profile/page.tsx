@@ -8,7 +8,7 @@ import { Mail, Phone, Calendar, ShieldCheck } from "lucide-react";
 import EditProfileButton from "@/components/profile/EditProfileButton";
 import ReviewList from "@/components/profile/ReviewList";
 
-export default function MyProfilePage() {
+export default function ParentMyProfilePage() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) return <ProfileSkeleton />;
