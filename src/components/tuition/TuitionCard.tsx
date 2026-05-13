@@ -127,7 +127,9 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
           </div>
           <div>
             <h4 className="text-sm font-bold flex items-center gap-1">
-              {post.parent.name}
+              <Link href={`/tutor/parent-profile/${post.parent.id}`} className="hover:underline">
+                {post.parent.name}
+              </Link>
               {isPremium && (
                 <Crown size={14} className="text-yellow-500 fill-yellow-500" />
               )}
