@@ -19,12 +19,15 @@ import { TuitionPost } from "@/types/tuition";
 import { fetcher } from "@/lib/api-client";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useAuth } from "@/providers/AuthProvider";
 
 // Import our sub-components
 import { Detail } from "./card-items/Detail";
 import { ActionButton } from "./card-items/ActionButton";
 
 export default function TuitionCard({ post }: { post: TuitionPost }) {
+  const { user } = useAuth();
+
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
   const [isPending, setIsPending] = useState(false);
 
@@ -34,6 +37,12 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
 
   const isPremium = post.parent.subscriptionType === "PREMIUM";
   const isClosed = post.status === "CLOSED";
+
+  // Dynamic Link Logic
+  const detailsHref =
+    user?.role === "PARENT"
+      ? `/parent/feed/${post.id}`
+      : `/tutor/feed/${post.id}`;
 
   const handleApply = async () => {
     setIsApplying(true);
@@ -102,7 +111,7 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-surface-hover overflow-hidden relative border border-border">
+          <div className="w-12 md:w-14 h-12 md:h-14 rounded-full bg-surface-hover overflow-hidden relative border border-border">
             {post.parent.photo ? (
               <Image
                 src={post.parent.photo}
@@ -173,27 +182,32 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
           <span>{isBookmarked ? "Saved" : "Save"}</span>
         </button>
 
-        {/* Apply Logic */}
-        {hasApplied ? (
-          <div className="flex items-center gap-2 px-3 py-2 text-green-600 font-bold text-sm">
-            <Send size={18} className="fill-green-600" />
-            <span>Applied</span>
-          </div>
-        ) : (
-          <button
-            onClick={() => setIsModalOpen(true)} // Open the modal
-            disabled={isClosed}
-            className={cn(
-              "flex items-center cursor-pointer gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all active:scale-95 text-primary hover:bg-primary/10",
-              isClosed && "opacity-50 cursor-not-allowed grayscale",
+        {/* ROLE-BASED APPLY LOGIC */}
+        {user?.role === "TUTOR" && (
+          <>
+            {hasApplied ? (
+              <div className="flex items-center gap-2 px-3 py-2 text-green-600 font-bold text-sm">
+                <Send size={18} className="fill-green-600" />
+                <span>Applied</span>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                disabled={isClosed}
+                className={cn(
+                  "flex items-center cursor-pointer gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all active:scale-95 text-primary hover:bg-primary/10",
+                  isClosed && "opacity-50 cursor-not-allowed grayscale",
+                )}
+              >
+                <Send size={18} />
+                <span>{isClosed ? "Closed" : "Apply"}</span>
+              </button>
             )}
-          >
-            <Send size={18} />
-            <span>{isClosed ? "Closed" : "Apply"}</span>
-          </button>
+          </>
         )}
 
-        <Link href={`/tutor/feed/${post.id}`}>
+        {/* Details Button (Dynamic Href) */}
+        <Link href={detailsHref}>
           <ActionButton icon={Eye} label="Details" />
         </Link>
       </div>
