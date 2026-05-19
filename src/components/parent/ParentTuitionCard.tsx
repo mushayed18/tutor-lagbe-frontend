@@ -11,6 +11,7 @@ import {
   Edit2,
   Trash2,
   Users,
+  Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TuitionPost } from "@/types/tuition";
@@ -72,7 +73,7 @@ export default function ParentTuitionCard({
           className={cn(
             "text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider",
             isClosed
-              ? "bg-muted text-text-muted"
+              ? "bg-red-500/10 text-red-400 border border-red-500/20"
               : "bg-green-500/10 text-green-600 border border-green-500/20",
           )}
         >
@@ -100,30 +101,54 @@ export default function ParentTuitionCard({
       </div>
 
       {/* Management Action Footer */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-4 border-t border-border mt-2">
+      <div className="flex items-center justify-center gap-2 pt-4 border-t border-border mt-2">
         {/* Applications Action (Left side) */}
-        <Link href={`/parent/my-posts/applications/${post.id}`}>
-          <button className="flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-primary bg-primary/5 hover:bg-primary/10 transition-all active:scale-95">
+        <Link href={`/parent/my-tuitions/applications/${post.id}`}>
+          <button className="flex cursor-pointer items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-primary hover:bg-primary/10 transition-all active:scale-95">
             <Users size={16} />
-            <span>Applications ({post.applicationsCount})</span>
+            <span>
+              <span className="hidden sm:inline">Applications </span>(
+              {post.applicationsCount})
+            </span>
           </button>
         </Link>
 
-        {/* Edit & Delete Actions (Right side) */}
+        {/* Management Control Actions (Right side) */}
         <div className="flex items-center gap-2">
-          <Link href={`/parent/my-posts/edit/${post.id}`}>
+          {/* View Post Details Action */}
+          <Link href={`/parent/my-tuitions/${post.id}`}>
             <button className="flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-text-muted hover:bg-surface-hover transition-all active:scale-95">
-              <Edit2 size={16} />
-              <span>Edit</span>
+              <Eye size={16} />
+              <span className="hidden sm:inline">View</span>
             </button>
           </Link>
 
+          {/* Edit Action (Conditional Disabled Logic Added Here) */}
+          {isClosed ? (
+            <button
+              disabled
+              title="Cannot edit a closed tuition posting"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-text-muted/40 bg-transparent opacity-50 cursor-not-allowed select-none"
+            >
+              <Edit2 size={16} />
+              <span className="hidden sm:inline">Edit</span>
+            </button>
+          ) : (
+            <Link href={`/parent/my-tuitions/edit/${post.id}`}>
+              <button className="flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-text-muted hover:bg-surface-hover transition-all active:scale-95">
+                <Edit2 size={16} />
+                <span className="hidden sm:inline">Edit</span>
+              </button>
+            </Link>
+          )}
+
+          {/* Delete Action (Kept enabled so parents can clean up closed items) */}
           <button
             onClick={() => onDeleteClick(post.id)}
             className="flex cursor-pointer items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-500/5 transition-all active:scale-95"
           >
             <Trash2 size={16} />
-            <span>Delete</span>
+            <span className="hidden sm:inline">Delete</span>
           </button>
         </div>
       </div>

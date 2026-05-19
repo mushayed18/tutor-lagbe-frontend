@@ -174,6 +174,18 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
             </p>
           </div>
         </div>
+
+        {/* Status Indicator Badge */}
+        <span
+          className={cn(
+            "text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider",
+            isClosed
+              ? "bg-red-500/10 text-red-400 border border-red-500/20"
+              : "bg-green-500/10 text-green-600 border border-green-500/20",
+          )}
+        >
+          {post.status}
+        </span>
       </div>
 
       {/* Content */}
