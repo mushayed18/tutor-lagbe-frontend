@@ -44,7 +44,7 @@ export default function ParentProfilePage() {
     <div className="max-w-4xl mx-auto py-6 px-4 pb-20">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-text-muted hover:text-primary mb-6 transition-colors font-bold text-sm"
+        className="cursor-pointer flex items-center gap-2 text-text-muted hover:text-primary mb-6 transition-colors font-bold text-sm"
       >
         <ChevronLeft size={20} /> Back
       </button>

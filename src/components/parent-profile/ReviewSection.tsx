@@ -8,6 +8,8 @@ import ReviewSkeleton from "./ReviewSkeleton";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/AuthProvider";
 import ReviewForm from "./ReviewForm";
+import { MessageSquareText } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 export default function ReviewSection({
   targetUserId,
@@ -22,6 +24,10 @@ export default function ReviewSection({
   const [isLoading, setIsLoading] = useState(true);
 
   const observer = useRef<IntersectionObserver | null>(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [reviewIdToDelete, setReviewIdToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadReviews = useCallback(async () => {
     try {
@@ -79,6 +85,26 @@ export default function ReviewSection({
     checkEligibility();
   }, [targetUserId, user]);
 
+  // const handleCreateReview = async (comment: string, rating: number) => {
+  //   try {
+  //     const res = await fetcher("/reviews", {
+  //       method: "POST",
+  //       body: JSON.stringify({ targetUserId, comment, rating }),
+  //     });
+  //     const result = await res.json();
+
+  //     if (result.success) {
+  //       // Add new review to the TOP of the list instantly
+  //       setReviews((prev) => [result.data, ...prev]);
+  //       setCanReview(false); // Hide the form after posting
+  //       toast.success("Review posted successfully!");
+  //     }
+  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   } catch (error) {
+  //     toast.error("Failed to post review");
+  //   }
+  // };
+
   const handleCreateReview = async (comment: string, rating: number) => {
     try {
       const res = await fetcher("/reviews", {
@@ -88,9 +114,21 @@ export default function ReviewSection({
       const result = await res.json();
 
       if (result.success) {
-        // Add new review to the TOP of the list instantly
-        setReviews((prev) => [result.data, ...prev]);
-        setCanReview(false); // Hide the form after posting
+        // 1. Enrich the result with the current user's data
+        // This ensures the Name and Photo show up instantly
+        const newReviewWithUserData = {
+          ...result.data,
+          reviewer: {
+            id: user?.id,
+            name: user?.name,
+            photo: user?.photo, // Make sure these fields exist in your Auth context
+          },
+        };
+
+        // 2. Add the enriched review to the TOP of the list
+        setReviews((prev) => [newReviewWithUserData, ...prev]);
+
+        setCanReview(false);
         toast.success("Review posted successfully!");
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -121,24 +159,42 @@ export default function ReviewSection({
     }
   };
 
-  const handleDeleteReview = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) return;
+  const handleDeleteClick = (id: string) => {
+    setReviewIdToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!reviewIdToDelete) return;
+
+    setIsDeleting(true);
     try {
-      const res = await fetcher(`/reviews/${id}`, { method: "DELETE" });
+      const res = await fetcher(`/reviews/${reviewIdToDelete}`, {
+        method: "DELETE",
+      });
       if (res.ok) {
-        setReviews((prev) => prev.filter((r) => r.id !== id));
+        setReviews((prev) => prev.filter((r) => r.id !== reviewIdToDelete));
+        setCanReview(true);
         toast.success("Review deleted");
+        setIsDeleteModalOpen(false); // Close modal on success
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Delete failed");
+    } finally {
+      setIsDeleting(false);
+      setReviewIdToDelete(null);
     }
   };
 
   return (
     <div className="space-y-6 mt-10">
       <h3 className="text-xl font-black text-text-main flex items-center gap-3 px-2">
-        Tutor Reviews
+        <div className="flex items-center gap-2">
+          <MessageSquareText size={20} className="text-primary" />
+          <h2 className="text-lg font-bold text-text-main">User Reviews</h2>
+        </div>
+
         <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">
           {reviews.length > 0 ? reviews.length : 0}
         </span>
@@ -156,7 +212,7 @@ export default function ReviewSection({
               review={review}
               currentUserId={user?.id}
               onUpdate={handleUpdateReview}
-              onDelete={handleDeleteReview}
+              onDelete={handleDeleteClick}
             />
           </div>
         ))}
@@ -178,6 +234,15 @@ export default function ReviewSection({
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Review"
+        message="Are you sure you want to permanently remove this review? This action cannot be undone."
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

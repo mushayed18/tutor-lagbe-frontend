@@ -38,7 +38,10 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
   const isPremium = post.parent.subscriptionType === "PREMIUM";
   const isClosed = post.status === "CLOSED";
 
-  // Dynamic Link Logic
+  // Check if the current user viewing this card is a Tutor
+  const isTutor = user?.role === "TUTOR";
+
+  // Dynamic Link Logic for the Details Button
   const detailsHref =
     user?.role === "PARENT"
       ? `/parent/feed/${post.id}`
@@ -111,25 +114,57 @@ export default function TuitionCard({ post }: { post: TuitionPost }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 md:w-14 h-12 md:h-14 rounded-full bg-surface-hover overflow-hidden relative border border-border">
-            {post.parent.photo ? (
-              <Image
-                src={post.parent.photo}
-                alt={post.parent.name}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center font-bold text-primary">
-                {post.parent.name[0]}
-              </div>
-            )}
-          </div>
+          {/* Dynamic Avatar Wrapper: Link for Tutor, static div for Parent */}
+          {isTutor ? (
+            <Link
+              href={`/tutor/parent-profile/${post.parent.id}`}
+              className="w-12 md:w-14 h-12 md:h-14 rounded-full bg-surface-hover overflow-hidden relative border border-border block cursor-pointer"
+            >
+              {post.parent.photo ? (
+                <Image
+                  src={post.parent.photo}
+                  alt={post.parent.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center font-bold text-primary">
+                  {post.parent.name[0]}
+                </div>
+              )}
+            </Link>
+          ) : (
+            <div className="w-12 md:w-14 h-12 md:h-14 rounded-full bg-surface-hover overflow-hidden relative border border-border block cursor-default">
+              {post.parent.photo ? (
+                <Image
+                  src={post.parent.photo}
+                  alt={post.parent.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center font-bold text-primary">
+                  {post.parent.name[0]}
+                </div>
+              )}
+            </div>
+          )}
+
           <div>
             <h4 className="text-sm font-bold flex items-center gap-1">
-              <Link href={`/tutor/parent-profile/${post.parent.id}`} className="hover:underline">
-                {post.parent.name}
-              </Link>
+              {/* Dynamic Name Link: Only links if viewer is a Tutor */}
+              {isTutor ? (
+                <Link
+                  href={`/tutor/parent-profile/${post.parent.id}`}
+                  className="hover:underline cursor-pointer"
+                >
+                  {post.parent.name}
+                </Link>
+              ) : (
+                <span className="text-text-main cursor-default">
+                  {post.parent.name}
+                </span>
+              )}
               {isPremium && (
                 <Crown size={14} className="text-yellow-500 fill-yellow-500" />
               )}

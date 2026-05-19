@@ -27,6 +27,7 @@ import DetailsSkeleton from "@/components/tuition/TuitionDetailsSkeleton";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/ConfirmModal"; // Import your new modal
+import Link from "next/link";
 
 export default function TuitionDetailsPage() {
   const { id } = useParams();
@@ -206,8 +207,11 @@ export default function TuitionDetailsPage() {
 
         <div className="space-y-6">
           <div className="bg-background border border-border rounded-2xl p-6 sticky top-24">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-full bg-surface-hover relative overflow-hidden border-2 border-primary/20">
+            <Link
+              href={`/tutor/parent-profile/${data.parent.id}`}
+              className="flex items-center gap-4 mb-6 group cursor-pointer"
+            >
+              <div className="w-16 h-16 rounded-full bg-surface-hover relative overflow-hidden border-2">
                 {data.parent.photo ? (
                   <Image
                     src={data.parent.photo}
@@ -222,10 +226,13 @@ export default function TuitionDetailsPage() {
                 )}
               </div>
               <div>
-                <h3 className="font-bold text-text-main">{data.parent.name}</h3>
+                {/* Added group-hover utility so the text responds naturally when hover state initializes */}
+                <h3 className="font-bold text-text-main group-hover:text-primary group-hover:underline transition-colors">
+                  {data.parent.name}
+                </h3>
                 <p className="text-xs text-text-muted">Parent / Job Poster</p>
               </div>
-            </div>
+            </Link>
 
             <div className="space-y-3">
               {hasApplied ? (

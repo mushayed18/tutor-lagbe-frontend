@@ -19,6 +19,7 @@ export interface TuitionPost {
   createdAt: string;
   isBookmarked: boolean;
   hasApplied: boolean;
+  applicationsCount?: number;
   parent: TuitionParent;
 }
 

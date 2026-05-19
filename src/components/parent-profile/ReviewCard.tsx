@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { MoreHorizontal, Star, Edit2, Trash2, X, Check } from "lucide-react";
+import { MoreHorizontal, Star, Edit2, Trash2, X, Check, User } from "lucide-react";
 import { Review } from "@/types/user";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,7 @@ interface ReviewCardProps {
   review: Review;
   currentUserId?: string;
   onUpdate: (id: string, comment: string, rating: number) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void> | void;
 }
 
 export default function ReviewCard({
@@ -39,43 +39,43 @@ export default function ReviewCard({
   };
 
   return (
-    <div className="group relative bg-background border border-border rounded-3xl p-5 transition-all hover:border-primary/20">
+    <div className="group relative bg-background transition-all hover:border-primary/20">
       <div className="flex gap-4">
         {/* Reviewer Avatar */}
-        <div className="shrink-0 w-12 h-12 rounded-2xl bg-surface-hover overflow-hidden relative">
+        <div className="relative w-10 h-10 rounded-full bg-surface-hover overflow-hidden shrink-0">
           {review?.reviewer?.photo ? (
             <Image
-              src={review.reviewer.photo}
-              alt={review.reviewer.name}
+              src={review?.reviewer?.photo}
+              alt={review?.reviewer?.name}
               fill
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center font-bold text-primary">
-              {review.reviewer.name[0]}
+            <div className="w-full h-full flex items-center justify-center text-text-muted">
+              <User size={20} />
             </div>
           )}
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-1">
-            <div>
-              <h4 className="font-bold text-text-main truncate">
-                {review.reviewer.name}
-              </h4>
-              <p className="text-[10px] text-text-muted font-medium">
-                {formatDistanceToNow(new Date(review.createdAt), {
-                  addSuffix: true,
-                })}
-              </p>
-            </div>
+            <div className="flex items-center gap-2">
+            <h4 className="text-sm font-bold text-text-main">
+              {review?.reviewer?.name}
+            </h4>
+            <span className="text-[11px] text-text-muted">
+              ( {formatDistanceToNow(new Date(review.createdAt), {
+                addSuffix: true,
+              })} )
+            </span>
+          </div>
 
             {/* Facebook-style Ellipsis Menu */}
             {isOwner && !isEditing && (
               <div className="relative">
                 <button
                   onClick={() => setShowOptions(!showOptions)}
-                  className="p-1 hover:bg-surface-hover rounded-lg transition-colors text-text-muted hover:text-text-main"
+                  className="cursor-pointer p-1 hover:bg-surface-hover rounded-lg transition-colors text-text-muted hover:text-text-main"
                 >
                   <MoreHorizontal size={20} />
                 </button>
@@ -92,7 +92,7 @@ export default function ReviewCard({
                           setIsEditing(true);
                           setShowOptions(false);
                         }}
-                        className="w-full px-4 py-2 text-xs font-bold text-left hover:bg-surface-hover flex items-center gap-2"
+                        className="cursor-pointer w-full px-4 py-2 text-xs font-bold text-left hover:bg-surface-hover flex items-center gap-2"
                       >
                         <Edit2 size={14} /> Edit
                       </button>
@@ -101,7 +101,7 @@ export default function ReviewCard({
                           onDelete(review.id);
                           setShowOptions(false);
                         }}
-                        className="w-full px-4 py-2 text-xs font-bold text-left hover:bg-surface-hover text-red-500 flex items-center gap-2"
+                        className="cursor-pointer w-full px-4 py-2 text-xs font-bold text-left hover:bg-surface-hover text-red-500 flex items-center gap-2"
                       >
                         <Trash2 size={14} /> Delete
                       </button>

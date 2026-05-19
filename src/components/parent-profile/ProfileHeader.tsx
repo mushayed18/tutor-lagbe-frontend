@@ -16,7 +16,7 @@ export default function ProfileHeader({ user }: { user: ParentProfile }) {
       <div className="px-8 pb-8">
         <div className="relative flex flex-col md:flex-row gap-6 -mt-12 items-end md:items-center">
           {/* Avatar */}
-          <div className="w-32 h-32 rounded-4xl bg-surface-hover border-4 border-background overflow-hidden relative shadow-xl">
+          <div className="w-32 h-32 rounded-full bg-surface-hover border-4 border-background overflow-hidden relative shadow-xl">
             {user.photo ? (
               <Image src={user.photo} alt={user.name} fill className="object-cover" />
             ) : (

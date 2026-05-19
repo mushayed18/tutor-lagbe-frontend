@@ -48,7 +48,7 @@ export default function ContactItem({
             size={18}
             className="text-text-muted opacity-50 cursor-help"
           />
-          <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-text-main text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-black text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             Locked for safety. Hire this parent to view contact details.
           </div>
         </div>

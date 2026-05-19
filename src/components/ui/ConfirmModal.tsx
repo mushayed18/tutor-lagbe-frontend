@@ -34,7 +34,7 @@ export function ConfirmModal({ isOpen, onClose, onConfirm, title, message, isLoa
             className="cursor-pointer px-4 py-2 rounded-lg bg-primary text-white font-semibold text-sm hover:opacity-90 transition-all flex items-center gap-2"
           >
             {isLoading && <Loader2 size={16} className="animate-spin" />}
-            Confirm Apply
+            Confirm
           </button>
         </div>
       </div>
