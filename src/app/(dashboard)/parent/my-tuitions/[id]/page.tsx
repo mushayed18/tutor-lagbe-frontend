@@ -215,7 +215,7 @@ export default function ParentMyTuitionDetailsPage() {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}
         title="Delete Tuition Post"
-        message="Are you sure you want to permanently delete this tuition post? This action cannot be undone."
+        message="Are you absolutely sure you want to delete this tuition posting? All applications associated with it will be permanently removed. This action cannot be undone."
         isLoading={isDeleting}
       />
     </div>
