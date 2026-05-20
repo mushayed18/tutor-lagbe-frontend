@@ -1,83 +1,115 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
-import { LogOut, Zap } from "lucide-react";
+import { LogOut, Zap, ChevronRight } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
+
+// Explicit type definition for matching your dynamic navigation registries
+interface NavigationLinkItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  priority?: boolean;
+}
+
+interface MobileMenuDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  user: {
+    name: string;
+    email: string;
+    subscriptionType?: "PREMIUM" | "FREE";
+  } | null;
+  allLinks: NavigationLinkItem[];
+}
 
 export default function MobileMenuDrawer({
   isOpen,
   onClose,
   user,
   allLinks,
-}: any) {
+}: MobileMenuDrawerProps) {
   const { logout } = useAuth();
   const isPremium = user?.subscriptionType === "PREMIUM";
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop overlay */}
       <div
         className={cn(
-          "md:hidden fixed inset-0 z-60 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300",
+          "md:hidden fixed inset-0 z-60 bg-black/50 backdrop-blur-[2px] transition-opacity duration-300",
           isOpen ? "opacity-100 visible" : "opacity-0 invisible",
         )}
         onClick={onClose}
       />
 
-      {/* Drawer Panel */}
+      {/* Drawer Panel Container */}
       <div
         className={cn(
-          "md:hidden fixed bottom-0 left-0 right-0 z-65 bg-background border-t border-border rounded-t-4xl p-6 pb-24 shadow-2xl transition-transform duration-500 ease-out",
+          "md:hidden fixed bottom-12 left-0 right-0 z-65 bg-background border-t border-border rounded-t-4xl p-5 pb-8 shadow-2xl transition-transform duration-400 ease-out flex flex-col max-h-[90vh]",
           isOpen ? "translate-y-0" : "translate-y-full",
         )}
       >
-        {/* Handle bar for visual cue */}
-        <div className="w-12 h-1.5 bg-border rounded-full mx-auto mb-6" />
+        {/* Handle bar pill indicator for a native app aesthetic */}
+        <div className="w-12 h-1 bg-border rounded-full mx-auto mb-5 shrink-0" />
 
-        {/* Premium Status Card */}
-        <div className="mb-6 p-4 rounded-2xl bg-surface border border-border flex items-center justify-between">
-          <div>
-            <p className="text-[10px] text-text-muted font-bold uppercase">
-              Status
+        {/* 1. Header Segment: Premium Upgrade Alert Action Block */}
+        <div className="mb-4 p-4 rounded-xl bg-surface border border-border/60 flex items-center justify-between gap-4 shrink-0">
+          <div className="min-w-0">
+            <p className="text-[10px] text-text-muted font-bold uppercase tracking-wider">
+              Account Membership Status
             </p>
-            <p className="text-sm font-bold">
-              {isPremium ? "PREMIUM" : "FREE PLAN"}
+            <p className="text-sm font-black text-text-main mt-0.5 truncate">
+              {isPremium ? "⭐ PREMIUM PLAN" : "FREE BASIC PLAN"}
             </p>
           </div>
           {!isPremium && (
-            <button className="bg-primary text-white text-xs px-4 py-2 rounded-xl font-bold flex items-center gap-2">
-              <Zap size={14} fill="white" /> Upgrade
+            <button className="bg-primary text-white text-xs px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 shrink-0 active:scale-95 transition-transform shadow-sm">
+              <Zap size={13} fill="white" /> Upgrade
             </button>
           )}
         </div>
 
-        {/* Full Link Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {allLinks.map((link: any) => (
+        {/* 2. Scrollable Body Wrapper: Formats items safely into a single-column list row */}
+        <div className="flex-1 overflow-y-auto no-scrollbar py-1 space-y-2 mb-4">
+          <p className="text-[10px] text-text-muted font-bold uppercase tracking-wider px-1 mb-2">
+            Navigation Menu
+          </p>
+
+          {allLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className="flex items-center gap-3 p-4 rounded-2xl bg-surface border border-border/50 active:bg-surface-hover transition-colors"
+              className="flex items-center justify-between p-3.5 rounded-xl bg-surface/50 border border-border/40 active:bg-surface-hover transition-colors group"
             >
-              <link.icon size={20} className="text-primary" />
-              <span className="text-sm font-semibold">{link.label}</span>
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="p-2 bg-background rounded-lg border border-border/40 text-primary group-active:text-primary">
+                  <link.icon size={18} />
+                </div>
+                <span className="text-sm font-bold text-text-main truncate">
+                  {link.label}
+                </span>
+              </div>
+              <ChevronRight size={16} className="text-text-muted/60" />
             </Link>
           ))}
         </div>
 
-        {/* Permanent Red Logout */}
-        <button
-          onClick={() => {
-            logout();
-            onClose();
-          }}
-          className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-red-500/10 text-red-500 font-bold active:scale-[0.98] transition-transform"
-        >
-          <LogOut size={20} /> Logout
-        </button>
+        {/* 3. Action segment: Permanent Red Logout button */}
+        <div className="pt-2 border-t border-border/60 shrink-0">
+          <button
+            onClick={() => {
+              logout();
+              onClose();
+            }}
+            className="w-full flex items-center justify-center gap-2 p-3.5 rounded-xl bg-red-500/10 text-red-500 text-sm font-bold active:scale-[0.98] transition-all hover:bg-red-500/15"
+          >
+            <LogOut size={18} /> Logout Account
+          </button>
+        </div>
       </div>
     </>
   );

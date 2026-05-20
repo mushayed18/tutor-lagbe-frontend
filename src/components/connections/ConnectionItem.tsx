@@ -18,6 +18,12 @@ interface ConnectionItemProps {
 export default function ConnectionItem({ connection }: ConnectionItemProps) {
   const { user } = useAuth();
 
+  // Dynamic routing based on the viewing user's dashboard role context
+  const profileLink =
+    user?.role === "PARENT"
+      ? `/parent/tutor-profile/${connection.userId}`
+      : `/tutor/parent-profile/${connection.userId}`;
+
   const tuitionLink =
     user?.role === "PARENT"
       ? `/parent/my-tuitions/${connection.tuitionId}`
@@ -26,17 +32,14 @@ export default function ConnectionItem({ connection }: ConnectionItemProps) {
   return (
     <div className="group relative flex items-center gap-4 p-4 hover:bg-surface-hover/50 transition-all duration-200 border-b border-border/40">
       {/* 1. Avatar - Fixed for perfect circle */}
-      <Link
-        href={`/profile/${connection.userId}`}
-        className="relative shrink-0"
-      >
+      <Link href={profileLink} className="relative shrink-0">
         <div className="w-14 h-14 rounded-full border-2 border-primary/10 overflow-hidden bg-surface-hover aspect-square relative">
           {connection.photo ? (
             <Image
               src={connection.photo}
               alt={connection.name}
               fill
-              className="object-cover rounded-full" // Added rounded-full here too
+              className="object-cover rounded-full"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-primary/5 text-primary">
@@ -48,7 +51,7 @@ export default function ConnectionItem({ connection }: ConnectionItemProps) {
 
       {/* 2. Middle Content */}
       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-        <Link href={`/profile/${connection.userId}`}>
+        <Link href={profileLink}>
           <h3 className="font-bold text-text-main truncate hover:text-primary transition-colors">
             {connection.name}
           </h3>
@@ -69,8 +72,9 @@ export default function ConnectionItem({ connection }: ConnectionItemProps) {
         </Link>
       </div>
 
+      {/* 3. Action button routed to matching profile context */}
       <Link
-        href={`/profile/${connection.userId}`}
+        href={profileLink}
         className="px-5 py-2 bg-primary/10 text-primary rounded-full text-xs font-bold hover:bg-primary hover:text-white transition-all"
       >
         Review

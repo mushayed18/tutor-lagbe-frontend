@@ -76,7 +76,7 @@ export default function TutorPortfolioView({
       {/* Title & Headline Block */}
       <div>
         <h3 className="text-lg font-black text-text-main flex items-center gap-2">
-          <FileText size={20} className="text-primary" /> Professional Portfolio
+          <FileText size={20} className="text-primary" /> Portfolio
         </h3>
         {portfolio.headline && (
           <p className="text-sm font-bold text-primary mt-2 bg-primary/5 px-3 py-1.5 rounded-xl inline-block">
@@ -91,7 +91,7 @@ export default function TutorPortfolioView({
           <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider ml-0.5">
             About the Tutor
           </h4>
-          <p className="text-sm font-medium text-text-main leading-relaxed bg-surface-hover/30 p-4 border border-border/40 rounded-xl whitespace-pre-wrap">
+          <p className="text-sm font-medium text-text-muted leading-relaxed p-4 border border-border/40 rounded-xl whitespace-pre-wrap">
             {portfolio.bio}
           </p>
         </div>

@@ -85,26 +85,6 @@ export default function ReviewSection({
     checkEligibility();
   }, [targetUserId, user]);
 
-  // const handleCreateReview = async (comment: string, rating: number) => {
-  //   try {
-  //     const res = await fetcher("/reviews", {
-  //       method: "POST",
-  //       body: JSON.stringify({ targetUserId, comment, rating }),
-  //     });
-  //     const result = await res.json();
-
-  //     if (result.success) {
-  //       // Add new review to the TOP of the list instantly
-  //       setReviews((prev) => [result.data, ...prev]);
-  //       setCanReview(false); // Hide the form after posting
-  //       toast.success("Review posted successfully!");
-  //     }
-  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   } catch (error) {
-  //     toast.error("Failed to post review");
-  //   }
-  // };
-
   const handleCreateReview = async (comment: string, rating: number) => {
     try {
       const res = await fetcher("/reviews", {

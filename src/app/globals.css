@@ -27,3 +27,14 @@ body {
   /* Ensuring the background spans the full height */
   min-height: 100vh;
 }
+
+@layer utilities {
+  /* Hides default native scrollbars while preserving full trackpad scrolling mechanics */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
