@@ -59,13 +59,13 @@ export default function ProfileHeader({ user }: { user: ParentProfile }) {
             icon={Mail} 
             label="Email Address" 
             value={user.email} 
-            placeholder="email••••@example.com" 
+            placeholder="" 
           />
           <ContactItem 
             icon={Phone} 
             label="Phone Number" 
             value={user.phone} 
-            placeholder="+880 •••••-••••••" 
+            placeholder="" 
           />
         </div>
       </div>

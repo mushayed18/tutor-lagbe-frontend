@@ -209,7 +209,7 @@ export default function ReviewSection({
         {reviews.length === 0 && !isLoading && (
           <div className="text-center py-20 bg-surface-hover/50 rounded-4xl border border-dashed border-border">
             <p className="text-text-muted font-medium">
-              No reviews yet for this parent.
+              No reviews yet.
             </p>
           </div>
         )}
