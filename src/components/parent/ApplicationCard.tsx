@@ -23,7 +23,7 @@ export default function ApplicationCard({
   const tutorProfileUrl = `/parent/tutor-profile/${applicant.tutorId}`;
 
   return (
-    <div className="flex items-center justify-between p-4 bg-background border border-border rounded-2xl shadow-sm transition-all hover:border-border/80 gap-4">
+    <div className="flex items-center justify-between py-4 bg-background border-b border-border shadow-sm transition-all hover:border-border/80 gap-4">
       {/* Left side: Avatar and Tutor info */}
       <div className="flex items-center gap-3 min-w-0">
         <Link
@@ -69,7 +69,7 @@ export default function ApplicationCard({
                 onClick={() =>
                   onStatusChange(applicant.applicationId, "REJECTED")
                 }
-                className="p-2 border border-border text-text-muted hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 rounded-xl transition-all disabled:opacity-50 active:scale-95"
+                className="cursor-pointer p-2 border border-border text-text-muted hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 rounded-xl transition-all disabled:opacity-50 active:scale-95"
                 title="Reject Application"
               >
                 <X size={16} />
@@ -77,7 +77,7 @@ export default function ApplicationCard({
               <button
                 disabled={isActionLoading}
                 onClick={() => onStatusChange(applicant.applicationId, "HIRED")}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 active:scale-95"
+                className="cursor-pointer flex items-center gap-1.5 px-3.5 py-2 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 active:scale-95"
               >
                 <Check size={14} /> Hire
               </button>

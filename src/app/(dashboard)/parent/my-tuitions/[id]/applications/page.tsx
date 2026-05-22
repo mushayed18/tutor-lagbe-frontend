@@ -54,7 +54,7 @@ export default function TuitionApplicationsPage() {
               result.data.meta.page < result.data.meta.totalPages,
           );
         }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Failed to fetch applications workflow list");
       } finally {
@@ -67,7 +67,7 @@ export default function TuitionApplicationsPage() {
   // Initial fetch trigger block
   useEffect(() => {
     fetchApplications(1);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tuitionId]);
 
   // Fetch next page when page index increments
@@ -75,7 +75,7 @@ export default function TuitionApplicationsPage() {
     if (page > 1) {
       fetchApplications(page);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   // Infinite scroll hook element anchor observer tracking setup
@@ -150,7 +150,7 @@ export default function TuitionApplicationsPage() {
           targetStatus: null,
         });
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error(
         "Failed to modify target applicant resolution tracking parameters",
@@ -195,18 +195,24 @@ export default function TuitionApplicationsPage() {
         ))}
 
         {/* Pulling loading item blocks skeletons stack view mapping */}
-        {isLoading &&
-          Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="animate-pulse bg-surface-hover/40 rounded-2xl h-20 border border-border/40 w-full"
-            />
-          ))}
+        {isLoading && (
+          <div className="flex flex-col gap-4 w-full px-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex gap-4 items-center animate-pulse">
+                <div className="w-14 h-14 rounded-full bg-surface-hover shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-32 bg-surface-hover rounded" />
+                  <div className="h-3 w-48 bg-surface-hover rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* End-of-content footer message element */}
         {!hasMore && applicants.length > 0 && (
           <p className="text-center text-text-muted text-xs font-semibold py-8">
-            You have reviewed all current applicant records.
+            You have reached the end of all applicant records.
           </p>
         )}
 

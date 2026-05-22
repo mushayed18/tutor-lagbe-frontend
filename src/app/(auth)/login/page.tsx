@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { LogIn, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { loginSchema, LoginInput } from "@/lib/validations/auth";
 import { fetcher } from "@/lib/api-client";
@@ -42,14 +42,26 @@ export default function LoginPage() {
 
       toast.success("Welcome back!");
 
+      // 1. Extract the role directly from the flat API response data structure
+      const userRole = result.data?.role;
+
+      // 2. Map user roles cleanly to their dedicated dashboard landing paths
+      const roleLandingPages: Record<string, string> = {
+        ADMIN: "/admin/users",
+        PARENT: "/parent/feed",
+        TUTOR: "/tutor/feed",
+      };
+
+      const destinationRoute = roleLandingPages[userRole] || "/";
+
+      // 3. Update global AuthContext state so the sidebar layout can render immediate links
       await refreshUser();
-      
-      // The browser now has the 'token' cookie. 
-      // We refresh to update the Server Components and redirect.
-      router.push("/");
-      router.refresh(); 
-      
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+      // 4. Trigger route transition and reload Server Components middleware checks
+      router.push(destinationRoute);
+      router.refresh();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -61,11 +73,12 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="w-full max-w-md bg-surface p-8 md:rounded-3xl border border-gray-800 shadow-2xl">
         <div className="text-center mb-8">
-          <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <LogIn className="text-primary" size={32} />
-          </div>
-          <h1 className="text-3xl font-bold text-text-main mb-2">Welcome Back</h1>
-          <p className="text-text-muted">Enter your details to access your account</p>
+          <h1 className="text-3xl font-bold text-text-main mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-text-muted">
+            Enter your details to access your account
+          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -86,7 +99,7 @@ export default function LoginPage() {
               error={errors.password?.message}
             />
             <div className="flex justify-end px-1">
-              <button 
+              <button
                 type="button"
                 onClick={() => router.push("/forgot-password")}
                 className="cursor-pointer text-xs text-primary hover:underline font-medium"
@@ -96,9 +109,9 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full mt-4 py-6" 
+          <Button
+            type="submit"
+            className="w-full mt-4 py-6"
             isLoading={isLoading}
           >
             Sign In <ArrowRight className="ml-2 h-4 w-4" />
@@ -107,7 +120,7 @@ export default function LoginPage() {
 
         <p className="text-center mt-8 text-sm text-text-muted">
           Don&apos;t have an account?{" "}
-          <button 
+          <button
             onClick={() => router.push("/register")}
             className="cursor-pointer text-primary font-semibold hover:underline"
           >

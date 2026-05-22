@@ -11,10 +11,12 @@ import { verifyEmailSchema, VerifyEmailInput } from "@/lib/validations/auth";
 import { fetcher } from "@/lib/api-client";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useAuth } from "@/providers/AuthProvider";
 
 // We separate the form into its own component to use searchParams safely
 function VerifyEmailForm() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
   const [isLoading, setIsLoading] = useState(false);
@@ -43,11 +45,25 @@ function VerifyEmailForm() {
       }
 
       toast.success("Account verified! Welcome to TutorLagbe.");
-      
-      // Since the cookie is set by the backend, we just redirect to dashboard
-      router.push("/");
-      router.refresh(); // Forces Next.js to re-check the cookie for the Navbar
-      
+
+      // 1. Extract the role directly from the flat API response data structure
+      const userRole = result.data?.role;
+
+      // 2. Map user roles cleanly to their dedicated dashboard landing paths
+      const roleLandingPages: Record<string, string> = {
+        PARENT: "/parent/feed",
+        TUTOR: "/tutor/feed",
+      };
+
+      const destinationRoute = roleLandingPages[userRole] || "/";
+
+      // 3. Update global AuthContext state so the sidebar layout can render immediate links
+      await refreshUser();
+
+      // 4. Trigger route transition and reload Server Components middleware checks
+      router.push(destinationRoute);
+      router.refresh();
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message);
