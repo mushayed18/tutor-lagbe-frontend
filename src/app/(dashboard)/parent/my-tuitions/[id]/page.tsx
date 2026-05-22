@@ -167,7 +167,7 @@ export default function ParentMyTuitionDetailsPage() {
       {/* Action Interface Management Footer Row */}
       <div className="flex items-center justify-between gap-2 pt-4 border-t border-border mt-2">
         {/* Applications Action (Left side) */}
-        <Link href={`/parent/my-tuitions/applications/${data.id}`}>
+        <Link href={`/parent/my-tuitions/${data.id}/applications`}>
           <button className="flex cursor-pointer items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-primary bg-primary/5 hover:bg-primary/10 transition-all active:scale-95">
             <Users size={16} />
             <span>

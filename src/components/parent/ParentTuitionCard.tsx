@@ -103,7 +103,7 @@ export default function ParentTuitionCard({
       {/* Management Action Footer */}
       <div className="flex items-center justify-center gap-2 pt-4 border-t border-border mt-2">
         {/* Applications Action (Left side) */}
-        <Link href={`/parent/my-tuitions/applications/${post.id}`}>
+        <Link href={`/parent/my-tuitions/${post.id}/applications`}>
           <button className="flex cursor-pointer items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-primary hover:bg-primary/10 transition-all active:scale-95">
             <Users size={16} />
             <span>
