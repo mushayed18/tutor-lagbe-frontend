@@ -61,9 +61,9 @@ export default function AdminUsersDirectoryPage() {
   };
 
   return (
-    <div className="space-y-6 p-4 max-w-6xl mx-auto">
+    <div className="space-y-6 md:p-4 max-w-6xl mx-auto mb-20">
       {/* Dashboard Top Header Title Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-background border border-border p-5 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-background md:border md:border-border md:p-5 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-primary/10 rounded-xl text-primary">
             <Users size={24} />
@@ -83,7 +83,7 @@ export default function AdminUsersDirectoryPage() {
         <button
           disabled={isLoading}
           onClick={() => loadUsersDirectory(urlPage)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 border border-border hover:bg-surface-hover rounded-xl text-xs font-bold text-text-muted hover:text-text-main transition-all active:scale-95 disabled:opacity-40 shrink-0 self-start sm:self-center"
+          className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 border border-border hover:bg-surface-hover rounded-xl text-xs font-bold text-text-muted hover:text-text-main transition-all active:scale-95 disabled:opacity-40 shrink-0 self-start sm:self-center"
         >
           <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />{" "}
           Reload Table

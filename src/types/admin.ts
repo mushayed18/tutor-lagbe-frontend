@@ -11,6 +11,21 @@ export interface AdminUserRecord {
   createdAt: string;
 }
 
+export interface AdminSingleUserDetail {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  photo: string | null;
+  role: UserRole;
+  location: string | null;
+  isBanned: boolean;
+  isVerified: boolean;
+  subscriptionType: "FREE" | "PREMIUM";
+  subscriptionExpiresAt: string | null;
+  createdAt: string;
+}
+
 export interface PaginationMeta {
   page: number;
   limit: number;
@@ -24,4 +39,10 @@ export interface GetUsersApiResponse {
   message: string;
   meta: PaginationMeta;
   data: AdminUserRecord[];
+}
+
+export interface GetSingleUserApiResponse {
+  success: boolean;
+  message: string;
+  data: AdminSingleUserDetail;
 }

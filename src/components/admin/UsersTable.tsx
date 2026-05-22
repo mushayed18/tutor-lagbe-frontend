@@ -16,7 +16,7 @@ interface UsersTableProps {
 
 export default function UsersTable({ users }: UsersTableProps) {
   return (
-    <div className="w-full bg-background border border-border rounded-2xl shadow-sm overflow-hidden">
+    <div className="w-full bg-background md:border md:border-border md:rounded-2xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
