@@ -9,6 +9,7 @@ import ProfileImageUpload from "@/components/profile/ProfileImageUpload";
 import EditInput from "@/components/profile/EditInput";
 import Button from "@/components/ui/Button";
 import { toast } from "sonner"; // Fix 1: Sonner
+import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 
 export default function ParentEditProfilePage() {
   const router = useRouter();
@@ -124,6 +125,8 @@ export default function ParentEditProfilePage() {
           )}
         </Button>
       </form>
+
+      <ChangePasswordForm />
     </div>
   );
 }
