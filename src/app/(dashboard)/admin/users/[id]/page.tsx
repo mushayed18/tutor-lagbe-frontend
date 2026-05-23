@@ -7,8 +7,7 @@ import { AdminSingleUserDetail, GetSingleUserApiResponse } from "@/types/admin";
 import UserProfileHeader from "@/components/admin/UserProfileHeader";
 import AccountDetailsCard from "@/components/admin/AccountDetailsCard";
 import ProfileLoadingState from "@/components/admin/ProfileLoadingState";
-import { ChevronLeft, ArrowLeftCircle } from "lucide-react";
-import Link from "next/link";
+import { ArrowLeftCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import UserModerationCard from "@/components/admin/UserModerationCard";
 
@@ -52,15 +51,12 @@ export default function AdminSingleUserPage() {
 
   return (
     <div className="space-y-6 p-4 max-w-4xl mx-auto mb-20">
-      {/* Back Navigator Link Context Header */}
-      <div className="flex items-center gap-2">
-        <Link
-          href="/admin/users"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-surface-hover text-text-muted hover:text-text-main font-bold text-xs rounded-xl border border-border/40 transition-colors"
-        >
-          <ChevronLeft size={14} /> Back to Directory
-        </Link>
-      </div>
+      <button
+        onClick={() => router.back()}
+        className="p-2 hover:bg-surface-hover rounded-full transition-colors cursor-pointer"
+      >
+        <ArrowLeft size={24} />
+      </button>
 
       {/* Primary Display Processing Hub Router View */}
       {isLoading ? (

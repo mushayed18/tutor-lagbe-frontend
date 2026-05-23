@@ -51,7 +51,7 @@ export default function EditProfilePage() {
       if (result.success) {
         await refreshUser(); // Update global auth state
         toast.success("Profile updated successfully");
-        router.push("/tutor/profile");
+        router.push("/admin/profile");
       } else {
         toast.error(result.message || "Failed to update profile");
       }

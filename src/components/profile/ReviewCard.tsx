@@ -19,7 +19,7 @@ interface ReviewCardProps {
 
 export default function ReviewCard({ review }: ReviewCardProps) {
   return (
-    <div className="py-5 border-b border-border last:border-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="py-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="flex gap-4">
         {/* Reviewer Avatar */}
         <div className="relative w-10 h-10 rounded-full bg-surface-hover overflow-hidden shrink-0">
