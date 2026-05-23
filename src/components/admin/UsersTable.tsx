@@ -46,8 +46,6 @@ export default function UsersTable({ users }: UsersTableProps) {
                   <span
                     className={cn(
                       "px-2.5 py-1 rounded-full text-xs font-bold border tracking-wide uppercase text-[10px]",
-                      user.role === "ADMIN" &&
-                        "bg-purple-500/10 text-purple-500 border-purple-500/20",
                       user.role === "PARENT" &&
                         "bg-blue-500/10 text-blue-500 border-blue-500/20",
                       user.role === "TUTOR" &&

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/providers/AuthProvider";
 import { fetcher } from "@/lib/api-client";
 import {
   GraduationCap,
@@ -16,31 +15,37 @@ import PortfolioHeader from "@/components/portfolio/PortfolioHeader";
 import PortfolioSection from "@/components/portfolio/PortfolioSection";
 import PortfolioSkeleton from "@/components/portfolio/PortfolioSkeleton";
 import PortfolioAction from "@/components/portfolio/PortfolioAction";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function PortfolioPage() {
-  const { user } = useAuth();
+  // 🌟 eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [portfolio, setPortfolio] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user?.id) return;
+  const { user } = useAuth();
 
+  useEffect(() => {
     const getPortfolio = async () => {
       try {
-        // Calling the API that includes User details
-        const res = await fetcher(`/portfolio/${user.id}`);
+        setLoading(true);
+
+        // 🌟 Changed from /portfolio/${user.id} to /portfolio/me
+        const res = await fetcher("/portfolio/me");
         const result = await res.json();
-        if (result.success) setPortfolio(result.data);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+        if (result.success) {
+          setPortfolio(result.data);
+        }
       } catch (error) {
-        console.error("Failed to fetch portfolio");
+        console.error("Failed to fetch portfolio:", error);
       } finally {
         setLoading(false);
       }
     };
+
     getPortfolio();
-  }, [user?.id]);
+  }, []); // 🌟 Clean empty dependency array! Fires exactly once when the page loads.
 
   if (loading) return <PortfolioSkeleton />;
 
@@ -62,43 +67,56 @@ export default function PortfolioPage() {
         ) : (
           <>
             <PortfolioHeader
-              name={portfolio.user.name}
-              photo={portfolio.user.photo}
-              headline={portfolio.headline}
-              bio={portfolio.bio}
+              name={user?.name || "Tutor Profile"}
+              photo={user?.photo || null}
+              headline={portfolio.headline || "No Headline Provided"}
+              bio={portfolio.bio || "No biography added yet."}
             />
 
             <PortfolioSection
               title="Educational Background"
               icon={GraduationCap}
             >
-              <ListItem label="University" value={portfolio.university} />
-              <ListItem label="Department" value={portfolio.department} />
+              <ListItem
+                label="University"
+                value={portfolio.university || "Not Provided"}
+              />
+              <ListItem
+                label="Department"
+                value={portfolio.department || "Not Provided"}
+              />
             </PortfolioSection>
 
             <PortfolioSection title="Tutoring Experience" icon={Briefcase}>
               <ListItem
                 label="Professional Experience"
-                value={portfolio.experience}
+                value={portfolio.experience || "No experience declared"}
               />
             </PortfolioSection>
 
             <PortfolioSection title="Teaching Preferences" icon={BookOpen}>
-              <ListItem label="Expertise Subjects" value={portfolio.subjects} />
+              <ListItem
+                label="Expertise Subjects"
+                value={portfolio.subjects || "Not Specified"}
+              />
               <ListItem
                 label="Preferred Classes"
-                value={portfolio.preferredClasses}
+                value={portfolio.preferredClasses || "Not Specified"}
               />
             </PortfolioSection>
 
             <PortfolioSection title="Financials & Time" icon={CircleDollarSign}>
               <ListItem
                 label="Expected Salary"
-                value={`${portfolio.expectedSalary} BDT / Month`}
+                value={
+                  portfolio.expectedSalary
+                    ? `${portfolio.expectedSalary} BDT / Month`
+                    : "Negotiable"
+                }
               />
               <ListItem
                 label="Weekly Availability"
-                value={portfolio.availability}
+                value={portfolio.availability || "Not Configured"}
                 icon={CalendarDays}
               />
             </PortfolioSection>
@@ -111,7 +129,6 @@ export default function PortfolioPage() {
   );
 }
 
-// Single-column list item with a clean, minimal design
 function ListItem({
   label,
   value,

@@ -2,7 +2,7 @@ import Skeleton from "../ui/Skeleton";
 
 export default function TuitionSkeletonCard() {
   return (
-    <div className="bg-background border border-border rounded-xl p-4 mb-4">
+    <div className="bg-background lg:border lg:border-border rounded-xl md:p-4 mb-4">
       <div className="flex items-center gap-3 mb-4">
         <Skeleton className="w-10 h-10 rounded-full" />
         <div className="space-y-2">

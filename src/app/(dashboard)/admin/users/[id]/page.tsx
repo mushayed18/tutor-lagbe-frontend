@@ -10,6 +10,7 @@ import ProfileLoadingState from "@/components/admin/ProfileLoadingState";
 import { ChevronLeft, ArrowLeftCircle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import UserModerationCard from "@/components/admin/UserModerationCard";
 
 export default function AdminSingleUserPage() {
   const params = useParams();
@@ -36,7 +37,7 @@ export default function AdminSingleUserPage() {
       if (result.success) {
         setUser(result.data);
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message);
       router.push("/admin/users"); // Bounce back to directory safety on broken lookups
@@ -68,6 +69,12 @@ export default function AdminSingleUserPage() {
         <div className="space-y-6">
           <UserProfileHeader user={user} />
           <AccountDetailsCard user={user} />
+
+          <UserModerationCard
+            userId={user.id}
+            initialBanStatus={user.isBanned}
+            onStatusUpdated={fetchSingleUserRecord} // Automatically updates header state colors on change!
+          />
         </div>
       ) : (
         <div className="text-center py-20 bg-surface-hover/30 rounded-3xl border border-dashed border-border p-6 flex flex-col items-center justify-center">

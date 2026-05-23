@@ -2,7 +2,7 @@
 
 export default function UsersTableSkeleton() {
   return (
-    <div className="w-full bg-surface rounded-2xl border border-border overflow-hidden animate-pulse">
+    <div className="w-full bg-surface md:rounded-2xl md:border md:border-border overflow-hidden animate-pulse">
       <div className="h-12 bg-surface-hover/60 border-b border-border" />
       <div className="divide-y divide-border/60">
         {Array.from({ length: 5 }).map((_, idx) => (
