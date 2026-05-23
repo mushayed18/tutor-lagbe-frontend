@@ -1,69 +1,109 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef, useCallback, Suspense } from "react";
 import { fetcher } from "@/lib/api-client";
-import {
-  AdminTuitionRecord,
-  AdminPaginationMeta,
-  GetAdminTuitionsApiResponse,
-} from "@/types/admin";
-import AdminTuitionsTable from "@/components/admin/AdminTuitionsTable";
-import TablePagination from "@/components/admin/TablePagination"; // Using your existing shared layout pagination
-import UsersTableSkeleton from "@/components/admin/UsersTableSkeleton"; // Fallback loading rows layout
-import { Briefcase, RefreshCw } from "lucide-react";
+import { AdminTuitionRecord, GetAdminTuitionsApiResponse } from "@/types/admin";
+import AdminTuitionCard from "@/components/admin/AdminTuitionCard";
+import { Briefcase, RefreshCw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-function AdminTuitionsDirectoryContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Parse page location integer seamlessly directly out of browser url bars parameter
-  const urlPage = Number(searchParams?.get("page")) || 1;
-
+function AdminTuitionsFeedContent() {
   const [tuitions, setTuitions] = useState<AdminTuitionRecord[]>([]);
-  const [meta, setMeta] = useState<AdminPaginationMeta | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
 
-  const fetchTuitionsRegistry = useCallback(async (targetPage: number) => {
-    try {
-      setIsLoading(true);
-      const response = await fetcher(
-        `/admin/tuitions?page=${targetPage}&limit=10`,
-      );
-      const result: GetAdminTuitionsApiResponse = await response.json();
+  // Sentinel DOM pointer track mapping element
+  const observerSentinelRef = useRef<HTMLDivElement | null>(null);
 
-      if (result.success) {
-        setTuitions(result.data);
-        setMeta(result.meta);
-      } else {
-        throw new Error(
-          result.message || "Failed to pull tuition records registry.",
+  const fetchTuitionFeed = useCallback(
+    async (targetPage: number, resetStream = false) => {
+      try {
+        if (resetStream) setIsInitialLoading(true);
+        else setIsFetchingNextPage(true);
+
+        const response = await fetcher(
+          `/admin/tuitions?page=${targetPage}&limit=10`,
         );
+        const result: GetAdminTuitionsApiResponse = await response.json();
+
+        if (result.success) {
+          const fetchedItems = result.data || [];
+
+          setTuitions((prev) =>
+            resetStream ? fetchedItems : [...prev, ...fetchedItems],
+          );
+
+          // Disable tracking checks if current pointer equals total server page ceilings
+          setHasMore(targetPage < (result.meta?.totalPages || 1));
+        } else {
+          throw new Error(result.message || "Failed to load tuitions feed.");
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        toast.error(error.message || "Network layer processing failure.");
+      } finally {
+        setIsInitialLoading(false);
+        setIsFetchingNextPage(false);
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(
-        error.message || "Data link failure encountered loading tuitions.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    },
+    [],
+  );
+
+  // Handle live card filtering out of memory state trees after successful deletion calls
+  const handleItemOmittedFromFeed = useCallback((id: string) => {
+    setTuitions((prev) => {
+      const updated = prev.filter((item) => item.id !== id);
+      return updated;
+    });
   }, []);
 
+  // Trigger base level content dump during structural mounting
   useEffect(() => {
-    fetchTuitionsRegistry(urlPage);
-  }, [urlPage, fetchTuitionsRegistry]);
+    fetchTuitionFeed(1, true);
+    setPage(1);
+  }, [fetchTuitionFeed]);
 
-  const handlePageNavigationChange = (newPage: number) => {
-    const params = new URLSearchParams(window.location.search);
-    params.set("page", newPage.toString());
-    router.push(`/admin/tuitions?${params.toString()}`);
+  // Set up native intersection runtime tracking layers
+  useEffect(() => {
+    const sentinelElement = observerSentinelRef.current;
+    if (!sentinelElement || !hasMore || isInitialLoading || isFetchingNextPage)
+      return;
+
+    const nativeObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          const nextPage = page + 1;
+          setPage(nextPage);
+          fetchTuitionFeed(nextPage);
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" }, // Pre-fetches 100px before reaching screen bounds
+    );
+
+    nativeObserver.observe(sentinelElement);
+
+    return () => {
+      if (sentinelElement) nativeObserver.unobserve(sentinelElement);
+    };
+  }, [
+    page,
+    hasMore,
+    isInitialLoading,
+    isFetchingNextPage,
+    fetchTuitionFeed,
+    handleItemOmittedFromFeed,
+  ]);
+
+  const handleManualRefreshReset = () => {
+    setPage(1);
+    fetchTuitionFeed(1, true);
   };
 
   return (
     <div className="space-y-6 md:p-4 max-w-6xl mx-auto mb-20">
-      {/* Title Header Toolbar Block view layouts */}
+      {/* Interactive Title Heading Banner Layout */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-background md:border md:border-border md:p-5 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-primary/10 rounded-xl text-primary">
@@ -71,50 +111,68 @@ function AdminTuitionsDirectoryContent() {
           </div>
           <div>
             <h1 className="text-xl font-black text-text-main tracking-tight">
-              Tuition Post Requirements Directory
+              Tuition Requirements Stream
             </h1>
             <p className="text-xs text-text-muted mt-0.5">
-              Review, audit, verify incoming postings, and remove obsolete
-              tuition matching advertisements.
+              Infinite scrolling pipeline grid audit for platform placement
+              validation logs.
             </p>
           </div>
         </div>
 
         <button
-          disabled={isLoading}
-          onClick={() => fetchTuitionsRegistry(urlPage)}
+          disabled={isInitialLoading || isFetchingNextPage}
+          onClick={handleManualRefreshReset}
           className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 border border-border hover:bg-surface-hover rounded-xl text-xs font-bold text-text-muted hover:text-text-main transition-all active:scale-95 disabled:opacity-40 shrink-0 self-start sm:self-center"
         >
-          <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
-          Reload Database
+          <RefreshCw
+            size={14}
+            className={isInitialLoading ? "animate-spin" : ""}
+          />
+          Reset Stream View
         </button>
       </div>
 
-      {/* Loading conditional matching layout logic container arrays */}
-      {isLoading ? (
-        <UsersTableSkeleton />
+      {/* Main Stream Interface Renderer */}
+      {isInitialLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(4)].map((_, idx) => (
+            <div
+              key={idx}
+              className="h-56 w-full animate-pulse bg-surface md:border md:border-border md:rounded-2xl"
+            />
+          ))}
+        </div>
       ) : tuitions.length > 0 ? (
         <div className="space-y-4">
-          <AdminTuitionsTable
-            tuitions={tuitions}
-            onTuitionDeleted={() => fetchTuitionsRegistry(urlPage)}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {tuitions.map((tuition) => (
+              <AdminTuitionCard
+                key={tuition.id}
+                tuition={tuition}
+                onDeleted={handleItemOmittedFromFeed}
+              />
+            ))}
+          </div>
 
-          {meta && (
-            <TablePagination
-              currentPage={meta.page}
-              totalPages={meta.totalPages}
-              totalRecords={meta.total}
-              currentCount={meta.count}
-              limit={meta.limit}
-              onPageChange={handlePageNavigationChange}
-            />
-          )}
+          {/* Hidden Anchor Element Watcher to Trigger Next Dynamic Pages Fetching */}
+          <div
+            ref={observerSentinelRef}
+            className="w-full flex justify-center py-6 h-10"
+          >
+            {isFetchingNextPage && (
+              <div className="flex items-center gap-2 text-xs font-bold text-text-muted animate-pulse">
+                <Loader2 size={14} className="animate-spin text-primary" />
+                <span>Loading older postings data records...</span>
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="text-center py-24 bg-surface-hover/20 rounded-3xl border border-dashed border-border p-6">
           <p className="text-sm font-bold text-text-muted">
-            No tuition requirement post records matched in this registry frame.
+            No active tuition requirements posted on file inside database
+            cluster indices.
           </p>
         </div>
       )}
@@ -122,11 +180,22 @@ function AdminTuitionsDirectoryContent() {
   );
 }
 
-// Export default wrapper sealed cleanly to pass standard server component build passes
+// Sealed Export entry to guarantee build compilation success
 export default function AdminTuitionsDirectoryPage() {
   return (
-    <Suspense fallback={<UsersTableSkeleton />}>
-      <AdminTuitionsDirectoryContent />
+    <Suspense
+      fallback={
+        <div className="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(4)].map((_, idx) => (
+            <div
+              key={idx}
+              className="h-56 w-full animate-pulse bg-surface md:border md:border-border md:rounded-2xl"
+            />
+          ))}
+        </div>
+      }
+    >
+      <AdminTuitionsFeedContent />
     </Suspense>
   );
 }

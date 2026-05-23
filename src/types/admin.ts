@@ -52,18 +52,23 @@ export interface AdminTuitionParent {
   name: string;
   email: string;
   phone: string | null;
+  photo: string | null;
   role: string;
 }
 
 export interface AdminTuitionRecord {
   id: string;
+  parentId: string;
   title: string;
-  class: string;
-  subjects: string;
+  description: string;
+  subject: string; // Matches JSON
+  classLevel: string; // Matches JSON
   salary: number;
   location: string;
+  daysPerWeek: number; // Matches JSON
+  timeSlot: string; // Matches JSON
+  status: string;
   createdAt: string;
-  parentId: string;
   parent: AdminTuitionParent;
   _count: {
     applications: number;
