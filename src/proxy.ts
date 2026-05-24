@@ -29,7 +29,7 @@ async function getVerifiedRoleFromToken(
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return (payload.role as UserRole) || null;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // Throws if token is expired, fake, or tampered with
     return null;
@@ -95,13 +95,23 @@ export default async function proxy(request: NextRequest) {
   // =========================================================================
   // RULE 3: Routing Fallback for raw Domain Root access "/"
   // =========================================================================
-  if (pathname === "/" && token && userRole) {
-    const trueDashboard = DASHBOARD_PREFIXES.find((d) => d.role === userRole);
-    if (trueDashboard) {
-      return NextResponse.redirect(
-        new URL(trueDashboard.fallback, request.url),
-      );
+  if (pathname === "/") {
+    // Scenario A: User is logged in -> Funnel them down to their role's workspace
+    if (token && userRole) {
+      const trueDashboard = DASHBOARD_PREFIXES.find((d) => d.role === userRole);
+      if (trueDashboard) {
+        return NextResponse.redirect(
+          new URL(trueDashboard.fallback, request.url),
+        );
+      }
     }
+
+    // Scenario B: User is NOT logged in -> Force them to the login page
+    const loginUrl = new URL("/login", request.url);
+    // Since hitting "/" means they wanted to go home, we don't necessarily
+    // need a callback track param, but keeping it clean just in case:
+    loginUrl.searchParams.set("redirect", "/");
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
