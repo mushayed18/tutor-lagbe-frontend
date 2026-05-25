@@ -1,6 +1,14 @@
+// middleware.ts  ← place this at the ROOT of your project (same level as package.json)
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose"; // ✅ MUST use jose, NOT jsonwebtoken (Edge Runtime safe)
 
+// ─────────────────────────────────────────────
+// 1. CONFIGURATION CONSTANTS
+// ─────────────────────────────────────────────
+
+// Pages that a logged-in user should NOT be able to visit
 const AUTH_ROUTES = [
   "/login",
   "/register",
@@ -9,36 +17,106 @@ const AUTH_ROUTES = [
   "/verify-email",
 ];
 
+// Which URL prefixes belong to which role
+const ROLE_ROUTES: Record<string, string[]> = {
+  ADMIN: ["/admin"],
+  TUTOR: ["/tutor"],
+  PARENT: ["/parent"],
+};
+
+// After login, where does each role land?
+function getDashboard(role: string | null): string {
+  if (role === "ADMIN") return "/admin/dashboard";
+  if (role === "TUTOR") return "/tutor/feed";
+  if (role === "PARENT") return "/parent/feed";
+  return "/login"; // unknown or null role → back to login
+}
+
+// ─────────────────────────────────────────────
+// 2. TOKEN DECODER (Edge-safe)
+// ─────────────────────────────────────────────
+
+async function getRole(token: string): Promise<string | null> {
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);
+    return (payload.role as string) ?? null;
+  } catch {
+    return null; // expired, tampered, or invalid token
+  }
+}
+
+// ─────────────────────────────────────────────
+// 3. MAIN MIDDLEWARE FUNCTION
+// ─────────────────────────────────────────────
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Look purely for the existence of the token cookie string
-  const hasToken = request.cookies.has("token");
+  // ── Step 1: Read & decode the token ──────────
+  const token = request.cookies.get("token")?.value;
+  let userRole: string | null = null;
 
-  // CASE 1: User IS logged in (has token) -> Block them from hitting /login or /register
-  if (hasToken && AUTH_ROUTES.includes(pathname)) {
-    // Since we aren't decoding the role here, we redirect them safely away to a default landing,
-    // or let Next.js handle the page destination. Let's send them to an empty/safe path,
-    // or simply redirect them to a baseline layout.
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  if (token) {
+    userRole = await getRole(token);
 
-  // CASE 2: User IS NOT logged in (no token)
-  if (!hasToken) {
-    // If they are trying to access an authentication page anyway, let them pass through smoothly
-    if (AUTH_ROUTES.includes(pathname)) {
-      return NextResponse.next();
+    // Token exists but is broken/expired → wipe it and send to login
+    if (!userRole) {
+      const response = NextResponse.redirect(new URL("/login", request.url));
+      response.cookies.delete("token");
+      return response;
     }
+  }
 
-    // For ALL other routes (/, /admin/*, /parent/*, /tutor/*), intercept and send to login
+  // ── Step 2: Logged-in users must not see auth pages ──
+  if (token && userRole && AUTH_ROUTES.includes(pathname)) {
+    return NextResponse.redirect(new URL(getDashboard(userRole), request.url));
+  }
+
+  // ── Step 3: Redirect root "/" based on login state ──
+  if (pathname === "/") {
+    if (token && userRole) {
+      return NextResponse.redirect(
+        new URL(getDashboard(userRole), request.url),
+      );
+    }
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  // ── Step 4: RBAC — protect every role-prefixed route ──
+  for (const role in ROLE_ROUTES) {
+    const belongsToThisRole = ROLE_ROUTES[role].some((path) =>
+      pathname.startsWith(path),
+    );
+
+    if (belongsToThisRole) {
+      // Case A: Not logged in at all → go to login, remember where they wanted to go
+      if (!token || !userRole) {
+        const loginUrl = new URL("/login", request.url);
+        loginUrl.searchParams.set("redirect", pathname); // e.g. /login?redirect=/tutor/feed
+        return NextResponse.redirect(loginUrl);
+      }
+
+      // Case B: Logged in but wrong role → go to their own dashboard
+      if (userRole !== role) {
+        return NextResponse.redirect(
+          new URL(getDashboard(userRole), request.url),
+        );
+      }
+    }
+  }
+
+  // ── Step 5: Everything passed, continue normally ──
   return NextResponse.next();
 }
 
+// ─────────────────────────────────────────────
+// 4. MATCHER — which paths this middleware runs on
+// ─────────────────────────────────────────────
+
 export const config = {
   matcher: [
+    // Run on every route EXCEPT Next.js internals and static files
     "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };
