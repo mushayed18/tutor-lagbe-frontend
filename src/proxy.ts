@@ -39,10 +39,21 @@ function getDashboard(role: string | null): string {
 async function getRole(token: string): Promise<string | null> {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    
+    // ✅ TEMPORARY DEBUG — remove after fix
+    console.log("JWT_SECRET exists:", !!process.env.JWT_SECRET);
+    console.log("JWT_SECRET length:", process.env.JWT_SECRET?.length);
+    console.log("Token exists:", !!token);
+    console.log("Token prefix:", token?.substring(0, 20));
+    
     const { payload } = await jwtVerify(token, secret);
+    
+    console.log("Decoded role:", payload.role); // ✅ does it reach here?
+    
     return (payload.role as string) ?? null;
-  } catch {
-    return null; // expired, tampered, or invalid token
+  } catch (error) {
+    console.log("jwtVerify failed:", error); // ✅ what error?
+    return null;
   }
 }
 
