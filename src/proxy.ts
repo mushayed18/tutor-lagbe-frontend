@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose"; // 🌟 Note: Keep jose here, standard jsonwebtoken crashes in Edge middleware runtimes!
 
 const AUTH_ROUTES = [
   "/login",
@@ -10,87 +9,34 @@ const AUTH_ROUTES = [
   "/verify-email",
 ];
 
-// Instructor's style Role Group map adapted to Tutor Lagbe requirements
-const roleGroup: Record<string, string[]> = {
-  ADMIN: ["/admin"],
-  TUTOR: ["/tutor"],
-  PARENT: ["/parent"],
-};
-
-// Fallback utility mapping roles to their primary landing feeds
-function getDashboard(role: string | null): string {
-  if (role === "ADMIN") return "/admin/users";
-  if (role === "TUTOR") return "/tutor/feed";
-  if (role === "PARENT") return "/parent/feed";
-  return "/login";
-}
-
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const pathWithQuery = `${pathname}${request.nextUrl.search}`;
 
-  // Extract token from cookies container
-  const token = request.cookies.get("token")?.value;
+  // Look purely for the existence of the token cookie string
+  const hasToken = request.cookies.has("token");
 
-  let userRole: string | null = null;
-
-  if (token) {
-    try {
-      const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-      const { payload } = await jwtVerify(token, secret);
-      userRole = (payload.role as string) || null;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      // Clean up broken tokens instantly on authorization validation failure
-      const res = NextResponse.redirect(new URL("/login", request.url));
-      res.cookies.delete("token");
-      return res;
-    }
-  }
-
-  // 1. Direct authenticated users away from authentication pages
-  if (token && userRole && AUTH_ROUTES.includes(pathname)) {
-    return NextResponse.redirect(new URL(getDashboard(userRole), request.url));
-  }
-
-  // 2. Strict protection check for raw domain root "/"
-  if (pathname === "/") {
-    if (token && userRole) {
-      return NextResponse.redirect(
-        new URL(getDashboard(userRole), request.url),
-      );
-    }
+  // CASE 1: User IS logged in (has token) -> Block them from hitting /login or /register
+  if (hasToken && AUTH_ROUTES.includes(pathname)) {
+    // Since we aren't decoding the role here, we redirect them safely away to a default landing,
+    // or let Next.js handle the page destination. Let's send them to an empty/safe path,
+    // or simply redirect them to a baseline layout.
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // 3. Instructor's Dynamic Role-Based Access Control (RBAC) loop
-  for (const role in roleGroup) {
-    if (roleGroup[role].some((path) => pathname.startsWith(path))) {
-      // If user has no valid token OR their active role does not match the dashboard group requirement
-      if (!token || userRole !== role) {
-        const targetDashboardRoute = getDashboard(userRole);
-
-        // Prevent infinite redirection loops by verifying target mismatch
-        if (pathname !== targetDashboardRoute) {
-          const redirectUrl = userRole
-            ? new URL(targetDashboardRoute, request.url)
-            : new URL("/login", request.url);
-
-          // Append return tracking query if redirecting an unauthenticated user to login
-          if (!userRole) {
-            redirectUrl.searchParams.set("redirect", pathWithQuery);
-          }
-
-          return NextResponse.redirect(redirectUrl);
-        }
-      }
+  // CASE 2: User IS NOT logged in (no token)
+  if (!hasToken) {
+    // If they are trying to access an authentication page anyway, let them pass through smoothly
+    if (AUTH_ROUTES.includes(pathname)) {
+      return NextResponse.next();
     }
+
+    // For ALL other routes (/, /admin/*, /parent/*, /tutor/*), intercept and send to login
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
 }
 
-// Ensure the routing pattern intercepts all pages except asset pipelines
 export const config = {
   matcher: [
     "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
