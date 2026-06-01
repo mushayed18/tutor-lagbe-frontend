@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   // proxy.ts can now read this cookie perfectly
   const response = NextResponse.json(result);
   response.cookies.set("token", result.token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",

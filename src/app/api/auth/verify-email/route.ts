@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   // ✅ Set cookie on FRONTEND domain
   const response = NextResponse.json(result);
   response.cookies.set("token", result.token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
