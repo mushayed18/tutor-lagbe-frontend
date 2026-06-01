@@ -57,13 +57,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
+      // ✅ Now calls /api/auth/logout (Next.js handler) which deletes the cookie
       const response = await fetcher("/auth/logout", { method: "POST" });
       const result = await response.json();
 
       if (result.success) {
-        setUser(null); // Clear local state
-        router.push("/login"); // Redirect to login
-        router.refresh(); // Ensure middleware picks up the cleared cookie
+        setUser(null);
+        router.push("/login");
+        router.refresh();
       }
     } catch (error) {
       console.error("Logout failed", error);
@@ -75,7 +76,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, refreshUser: loadUser, logout }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, refreshUser: loadUser, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

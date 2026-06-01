@@ -1,25 +1,31 @@
 import config from "@/config";
 
-export const fetcher = async (endpoint: string, options: RequestInit = {}) => {
-  const url = `${config.apiUrl}${endpoint}`;
+// These routes are handled by Next.js route handlers (same domain)
+// so the cookie gets set on the frontend domain where proxy.ts can read it
+const NEXT_JS_ROUTES = ["/auth/login", "/auth/logout", "/auth/verify-email"];
 
-  // 1. Initialize headers from options (if any)
+export const fetcher = async (endpoint: string, options: RequestInit = {}) => {
+  // ✅ Auth routes → Next.js route handler (same domain, cookie works)
+  // Everything else → Express backend directly
+  const isNextJsRoute = NEXT_JS_ROUTES.some((route) =>
+    endpoint.startsWith(route),
+  );
+  const url = isNextJsRoute
+    ? `/api${endpoint}` // e.g. /api/auth/login
+    : `${config.apiUrl}${endpoint}`; // e.g. https://tutor-lagbe-backend.onrender.com/api/user/me
+
   const headers = new Headers(options.headers);
 
-  // 2. Logic for Content-Type
   if (options.body instanceof FormData) {
-    // If body is FormData, we MUST NOT set Content-Type manually.
-    // The browser will automatically set it to multipart/form-data with the boundary.
     headers.delete("Content-Type");
   } else if (options.body && !headers.has("Content-Type")) {
-    // If there is a body and it's NOT FormData, default to JSON
     headers.set("Content-Type", "application/json");
   }
 
   const response = await fetch(url, {
     ...options,
     credentials: "include",
-    headers: headers, // 3. Pass the Headers object
+    headers: headers,
   });
 
   return response;
