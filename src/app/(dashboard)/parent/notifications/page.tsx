@@ -74,7 +74,7 @@ export default function ParentNotificationsPage() {
       </div>
 
       {/* Notifications List */}
-      <div className="flex flex-col bg-background rounded-4xl overflow-hidden shadow-sm">
+      <div className="flex flex-col bg-background overflow-hidden shadow-sm">
         {notifications.map((n) => (
           <NotificationItem key={n.id} notification={n} />
         ))}

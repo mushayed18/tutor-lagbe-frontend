@@ -73,7 +73,7 @@ function VerifyEmailForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-surface p-8 rounded-3xl border border-gray-800 shadow-2xl">
+    <div className="w-full max-w-md md:bg-surface p-8 md:rounded-3xl md:border md:border-gray-800 md:shadow-2xl">
       <div className="text-center mb-8">
         <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
           <MailCheck className="text-primary" size={32} />

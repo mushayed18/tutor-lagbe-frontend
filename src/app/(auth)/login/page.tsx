@@ -71,7 +71,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="w-full max-w-md bg-surface p-8 md:rounded-3xl border border-gray-800 shadow-2xl">
+      <div className="w-full max-w-md md:bg-surface p-8 md:rounded-3xl md:border md:border-gray-800 shadow-2xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-text-main mb-2">
             Welcome Back
