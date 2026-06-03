@@ -79,15 +79,11 @@ export default function ChangePasswordForm() {
       }
 
       toast.success(
-        `${result.message || "Password updated successfully!"} Logging out...`,
+        `${result.message || "Password updated successfully!"}`,
       );
       handleResetForm();
 
-      // Enforce systemic session purge redirect because backend drops tokens
-      setTimeout(() => {
-        router.push("/login");
-        window.location.reload();
-      }, 1500);
+      router.push("/");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
