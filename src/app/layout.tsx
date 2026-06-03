@@ -11,8 +11,11 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "TutorLagbe",
-  description: "Modern Tuition Marketplace",
+  title: "TutorLagbe | Find the Best Tutors & Tuition Online",
+  description: "Modern Tuition Marketplace connecting expert tutors with parents and students instantly.",
+  verification: {
+    google: "l2__SugeZAYbnZe5TymZLsH00nBnfQHJ3alZO1KHC1E", 
+  },
 };
 
 export default function RootLayout({
