@@ -1,21 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react"; // 👈 Added Suspense here
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import Button from "@/components/ui/Button";
 
-export default function SubscriptionSuccessPage() {
+// 1. Rename this main function to SuccessContent
+function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const { refreshUser, user } = useAuth();
   const [isConfirming, setIsConfirming] = useState(true);
 
   useEffect(() => {
-    // The webhook usually finishes before the browser redirects back here,
-    // but we poll refreshUser a few times in case it's still in flight.
     let attempts = 0;
     const interval = setInterval(async () => {
       attempts += 1;
@@ -72,5 +71,22 @@ export default function SubscriptionSuccessPage() {
         <Button className="mt-8">Back to feed</Button>
       </Link>
     </div>
+  );
+}
+
+// 2. This is the new default export that Next.js expects.
+// Wrapping SuccessContent inside <Suspense> tells Next.js to compile it safely.
+export default function SubscriptionSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex max-w-md mx-auto h-64 items-center justify-center text-sm text-text-muted">
+          <Loader2 className="animate-spin mr-2" size={16} /> Loading
+          confirmation...
+        </div>
+      }
+    >
+      <SuccessContent />
+    </Suspense>
   );
 }
