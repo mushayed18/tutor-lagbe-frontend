@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, Zap, ChevronRight } from "lucide-react";
+import { LogOut, Zap, ChevronRight, Crown } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
-// Explicit type definition for matching your dynamic navigation registries
 interface NavigationLinkItem {
   label: string;
   href: string;
@@ -17,10 +16,12 @@ interface NavigationLinkItem {
 interface MobileMenuDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  // Updated to accept subscriptionExpiresAt string/Date
   user: {
     name: string;
     email: string;
     subscriptionType?: "PREMIUM" | "FREE";
+    subscriptionExpiresAt?: string | Date | null;
   } | null;
   allLinks: NavigationLinkItem[];
 }
@@ -32,7 +33,12 @@ export default function MobileMenuDrawer({
   allLinks,
 }: MobileMenuDrawerProps) {
   const { logout } = useAuth();
-  const isPremium = user?.subscriptionType === "PREMIUM";
+
+  // Match the strict expiry check from RightPanel
+  const isPremium =
+    user?.subscriptionType === "PREMIUM" &&
+    !!user.subscriptionExpiresAt &&
+    new Date(user.subscriptionExpiresAt) > new Date();
 
   return (
     <>
@@ -61,18 +67,30 @@ export default function MobileMenuDrawer({
             <p className="text-[10px] text-text-muted font-bold uppercase tracking-wider">
               Account Membership Status
             </p>
-            <p className="text-sm font-black text-text-main mt-0.5 truncate">
-              {isPremium ? "⭐ PREMIUM PLAN" : "FREE BASIC PLAN"}
-            </p>
+            {isPremium ? (
+              <p className="text-sm font-black text-yellow-500 mt-0.5 flex items-center gap-1">
+                <Crown size={14} className="fill-yellow-500/20" /> PREMIUM PLAN
+              </p>
+            ) : (
+              <p className="text-sm font-black text-text-main mt-0.5">
+                FREE BASIC PLAN
+              </p>
+            )}
           </div>
+
+          {/* Turned into a functional Link navigating to your checkout panel */}
           {!isPremium && (
-            <button className="bg-primary text-white text-xs px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 shrink-0 active:scale-95 transition-transform shadow-sm">
+            <Link
+              href="/subscription"
+              onClick={onClose}
+              className="bg-primary text-white text-xs px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 shrink-0 active:scale-95 transition-transform shadow-sm"
+            >
               <Zap size={13} fill="white" /> Upgrade
-            </button>
+            </Link>
           )}
         </div>
 
-        {/* 2. Scrollable Body Wrapper: Formats items safely into a single-column list row */}
+        {/* 2. Scrollable Body Wrapper */}
         <div className="flex-1 overflow-y-auto no-scrollbar py-1 space-y-2 mb-4">
           <p className="text-[10px] text-text-muted font-bold uppercase tracking-wider px-1 mb-2">
             Navigation Menu

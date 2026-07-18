@@ -33,45 +33,65 @@ export default function RightPanel() {
     );
   }
 
-  const isPremium = user?.subscriptionType === "PREMIUM";
+  const isTutor = user?.role === "TUTOR";
+  const isParent = user?.role === "PARENT";
+
+  // Match the same "is it actually still active" check used everywhere else in
+  // the app (subscriptionType alone isn't enough — it can be stale past expiry).
+  const isPremium =
+    user?.subscriptionType === "PREMIUM" &&
+    !!user.subscriptionExpiresAt &&
+    new Date(user.subscriptionExpiresAt) > new Date();
+
+  const statusMessage = isPremium
+    ? isTutor
+      ? "Unlimited job applications unlocked."
+      : "Your posts are boosted to the top of the feed."
+    : isTutor
+      ? "Upgrade to apply to unlimited tuitions."
+      : "Upgrade to boost your posts to the top.";
+
+  const ctaTitle = isTutor ? "Apply Without Limits" : "Get Noticed First";
+  const ctaDescription = isTutor
+    ? "Free tutors are capped at 5 applications a day. Go Premium for unlimited applications."
+    : "Premium job posts are boosted to the top of the tutor feed and get more applicants, faster.";
 
   return (
     <aside className="hidden lg:flex flex-col gap-6 w-80 h-screen sticky top-0 p-4 border-l border-border bg-background">
       {/* 1. Account Status Card */}
-      <div className="p-4 rounded-2xl bg-surface border border-border">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-text-muted font-medium">
-            Account Status
-          </span>
-          {isPremium ? (
-            <span className="text-xs font-bold text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded-full flex items-center gap-1">
-              <Crown size={12} /> PREMIUM
+      {(isTutor || isParent) && (
+        <div className="p-4 rounded-2xl bg-surface border border-border">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-text-muted font-medium">
+              Account Status
             </span>
-          ) : (
-            <span className="text-xs font-bold text-text-muted bg-surface-hover px-2 py-1 rounded-full">
-              FREE
-            </span>
-          )}
+            {isPremium ? (
+              <span className="text-xs font-bold text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded-full flex items-center gap-1">
+                <Crown size={12} /> PREMIUM
+              </span>
+            ) : (
+              <span className="text-xs font-bold text-text-muted bg-surface-hover px-2 py-1 rounded-full">
+                FREE
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-text-main">{statusMessage}</p>
         </div>
-        <p className="text-sm text-text-main">
-          {isPremium
-            ? "Full access unlocked."
-            : "Upgrade to apply to more tuitions."}
-        </p>
-      </div>
+      )}
 
-      {/* 2. Premium CTA (Only for Free Users) */}
-      {!isPremium && (
-        <div className="p-6 rounded-2xl bg-linear-to-br from-primary to-primary-hover text-white shadow-lg shadow-primary/20">
+      {/* 2. Premium CTA (Only for Free Tutors/Parents) */}
+      {!isPremium && (isTutor || isParent) && (
+        <Link
+          href="/subscription"
+          className="block p-6 rounded-2xl bg-linear-to-br from-primary to-primary-hover text-white shadow-lg shadow-primary/20 hover:opacity-95 transition-opacity"
+        >
           <Zap size={24} className="mb-4 fill-white" />
-          <h3 className="text-lg font-bold">Boost Your Profile</h3>
-          <p className="text-sm mb-4 opacity-90">
-            Premium tutors get 5x more responses from parents.
-          </p>
-          <button className="w-full py-2.5 bg-white text-primary font-bold rounded-xl shadow-md hover:bg-gray-50 transition-colors">
+          <h3 className="text-lg font-bold">{ctaTitle}</h3>
+          <p className="text-sm mb-4 opacity-90">{ctaDescription}</p>
+          <span className="block w-full text-center py-2.5 bg-white text-primary font-bold rounded-xl shadow-md hover:bg-gray-50 transition-colors">
             Upgrade Now
-          </button>
-        </div>
+          </span>
+        </Link>
       )}
 
       {/* 3. FOOTER LINKS (The missing part) */}
