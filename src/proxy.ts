@@ -17,6 +17,9 @@ const AUTH_ROUTES = [
   "/verify-email",
 ];
 
+// 🟢 ADD THIS: Pages that require authentication but are shared by all logged-in roles
+const PRIVATE_ROUTES = ["/subscription"];
+
 // Which URL prefixes belong to which role
 const ROLE_ROUTES: Record<string, string[]> = {
   ADMIN: ["/admin"],
@@ -81,6 +84,17 @@ export async function proxy(request: NextRequest) {
       );
     }
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // NEW STEP HERE:
+  // ── Step 3.5: Protect shared private routes ──
+  const isPrivateRoute = PRIVATE_ROUTES.some((path) =>
+    pathname.startsWith(path),
+  );
+  if (isPrivateRoute && (!token || !userRole)) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname); // Sends them to /login?redirect=/subscription
+    return NextResponse.redirect(loginUrl);
   }
 
   // ── Step 4: RBAC — protect every role-prefixed route ──

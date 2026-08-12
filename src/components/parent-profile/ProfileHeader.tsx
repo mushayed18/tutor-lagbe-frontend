@@ -35,7 +35,7 @@ export default function ProfileHeader({ user }: { user: ParentProfile }) {
               )}
               {user.subscriptionType === "PREMIUM" && (
                 <span className="bg-yellow-500/10 text-yellow-600 text-[10px] font-black px-2 py-1 rounded-lg flex items-center gap-1">
-                  <Crown size={12} /> PREMIUM PARENT
+                  <Crown size={12} /> PREMIUM USER
                 </span>
               )}
             </div>

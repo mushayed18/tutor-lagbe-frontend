@@ -10,6 +10,7 @@ import {
   SubscriptionPlan,
 } from "@/lib/subscription";
 import Button from "@/components/ui/Button";
+import { SubscriptionSkeleton } from "@/components/subscription/SubscriptionSkeleton";
 
 export default function SubscriptionPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -40,11 +41,7 @@ export default function SubscriptionPage() {
   };
 
   if (authLoading || isLoadingPlan) {
-    return (
-      <div className="p-20 text-center text-text-muted text-sm">
-        Loading plan…
-      </div>
-    );
+    return <SubscriptionSkeleton />;
   }
 
   if (!user) {
